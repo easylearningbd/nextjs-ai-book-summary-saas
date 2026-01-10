@@ -26,6 +26,15 @@ model User {
   createdAt              DateTime  @default(now()) @map("created_at")
   updatedAt              DateTime  @updatedAt @map("updated_at")
 
+  /// Relations 
+  booksCreated        Book[]   @relation("BooksCreatedByUser")
+  reviews             BookReview[]
+  favorites           UserFavorite[]
+  readingHistory      UserReadingHistory[]
+  paymentTransactions PaymentTransaction[]
+  subscriptionsOrders SubscriptionOrder[]
+  adminActivityLogs   AdminActivityLog[]
+
   @@map("users")
 
 }
