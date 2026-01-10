@@ -56,3 +56,84 @@ enum SubscriptionStatus {
   EXPIRED
   CANCELLED
 }
+
+// 2. Categories Table
+model Category {
+  id            Int      @id @default(autoincrement())
+  name          String   @unique
+  slug          String   @unique
+  description   String?  @db.Text
+  icon          String?  // icon name or URL
+  displayOrder  Int      @default(0) @map("display_order")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  books         Book[]
+
+  @@map("categories")
+}
+
+
+// 3. Books Table
+model Book {
+  id                   Int      @id @default(autoincrement())
+  title                String
+  slug                 String   @unique
+  author               String
+  categoryId           Int      @map("category_id")
+  description          String?  @db.Text
+  coverImageUrl        String?  @map("cover_image_url")
+  originalPdfUrl       String?  @map("original_pdf_url")
+  originalPdfPath      String?  @map("original_pdf_path")
+  publicationYear      Int?     @map("publication_year")
+  isbn                 String?
+  readingTimeMinutes   Int      @default(15) @map("reading_time_minutes")
+  totalAudioDuration   Int      @default(0) @map("total_audio_duration") // seconds
+  averageRating        Decimal  @default(0.00) @db.Decimal(3, 2) @map("average_rating")
+  totalReviews         Int      @default(0) @map("total_reviews")
+  viewCount            Int      @default(0) @map("view_count")
+  isFeatured           Boolean  @default(false) @map("is_featured")
+  isPublished          Boolean  @default(false) @map("is_published")
+  summaryGenerated     Boolean  @default(false) @map("summary_generated")
+  audioGenerated       Boolean  @default(false) @map("audio_generated")
+  createdById          String   @map("created_by")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  category             Category           @relation(fields: [categoryId], references: [id])
+  createdBy            User               @relation("BooksCreatedByUser", fields: [createdById], references: [id])
+  summary              BookSummary?
+  chapters             BookChapter[]
+  reviews              BookReview[]
+  favorites            UserFavorite[]
+  readingHistory       UserReadingHistory[]
+
+  @@index([categoryId])
+  @@index([createdById])
+  @@index([slug])
+  @@map("books")
+}
+
+
+// 4. Book Summaries Table
+model BookSummary {
+  id               Int      @id @default(autoincrement())
+  bookId           Int      @unique @map("book_id")
+  mainSummary      String?  @db.Text @map("main_summary") // Brief overview
+  keyTakeaways     Json?    @map("key_takeaways") // Array of key points
+  fullSummary      String?  @db.LongText @map("full_summary") // Complete summary
+  tableOfContents  Json?    @map("table_of_contents") // Structured TOC
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  book             Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@map("book_summaries")
+}
+
+
+
