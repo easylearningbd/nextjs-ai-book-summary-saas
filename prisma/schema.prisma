@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql" 
+  url = env("DATABASE_URL")
 }
 
 
@@ -134,6 +135,196 @@ model BookSummary {
 
   @@map("book_summaries")
 }
+
+// 5. Book Chapters Table
+model BookChapter {
+  id             Int      @id @default(autoincrement())
+  bookId         Int      @map("book_id")
+  chapterNumber  Int      @map("chapter_number")
+  chapterTitle   String   @map("chapter_title")
+  chapterSummary String   @db.LongText @map("chapter_summary")
+  audioUrl       String?  @map("audio_url")
+  audioDuration  Int      @default(0) @map("audio_duration") // seconds
+  displayOrder   Int      @default(0) @map("display_order")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  book           Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([bookId])
+  @@map("book_chapters")
+}
+
+// 6. Book Reviews Table
+model BookReview {
+  id                  Int      @id @default(autoincrement())
+  bookId              Int      @map("book_id")
+  userId              String   @map("user_id")
+  rating              Int      // 1 to 5
+  reviewTitle         String?  @map("review_title")
+  reviewText          String?  @db.Text @map("review_text")
+  isVerifiedPurchase  Boolean  @default(false) @map("is_verified_purchase")
+  isApproved          Boolean  @default(true) @map("is_approved")
+  helpfulCount        Int      @default(0) @map("helpful_count")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  book                Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([bookId, userId]) // One review per user per book
+  @@index([bookId])
+  @@index([userId])
+  @@map("book_reviews")
+}
+
+
+// 7. User Favorites Table
+model UserFavorite {
+  id        Int      @id @default(autoincrement())
+  userId    String   @map("user_id")
+  bookId    Int      @map("book_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+  @@index([userId])
+  @@index([bookId])
+  @@map("user_favorites")
+}
+
+// 8. User Reading History Table
+model UserReadingHistory {
+  id                   Int      @id @default(autoincrement())
+  userId               String   @map("user_id")
+  bookId               Int      @map("book_id")
+  lastAccessed         DateTime @default(now()) @map("last_accessed")
+  completionPercentage Int      @default(0) @map("completion_percentage")
+  audioPosition        Int      @default(0) @map("audio_position") // seconds
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book                 Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+  @@index([userId])
+  @@index([bookId])
+  @@map("user_reading_history")
+}
+
+
+// 9. Subscription Plans Table
+model SubscriptionPlan {
+  id            Int      @id @default(autoincrement())
+  planName      String   @map("plan_name")
+  planType      PlanType @map("plan_type")
+  price         Decimal  @db.Decimal(10, 2)
+  features      Json?    // JSON array of features
+  stripePriceId String?  @map("stripe_price_id")
+  isActive      Boolean  @default(true) @map("is_active")
+  displayOrder  Int      @default(0) @map("display_order")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("subscription_plans")
+}
+
+enum PlanType {
+  MONTHLY
+  YEARLY
+  LIFETIME
+}
+
+// 10. Payment Transactions Table
+model PaymentTransaction {
+  id                     Int            @id @default(autoincrement())
+  userId                 String         @map("user_id")
+  stripePaymentIntentId  String?        @map("stripe_payment_intent_id")
+  amount                 Decimal        @db.Decimal(10, 2)
+  currency               String         @default("USD")
+  paymentStatus          PaymentStatus  @map("payment_status")
+  planType               PlanType       @map("plan_type")
+  metadata               Json?          // Additional payment metadata
+  createdAt              DateTime       @default(now()) @map("created_at")
+  updatedAt              DateTime       @updatedAt @map("updated_at")
+
+  // Relations
+  user                   User           @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("payment_transactions")
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+// 10b. Subscription Orders Table (Bank Transfer)
+model SubscriptionOrder {
+  id                    Int                @id @default(autoincrement())
+  userId                String             @map("user_id")
+  planType              PlanType           @map("plan_type")
+  amount                Decimal            @db.Decimal(10, 2)
+  currency              String             @default("USD")
+  paymentMethod         String             @default("BANK_TRANSFER") @map("payment_method")
+  paymentProofUrl       String?            @map("payment_proof_url") // Screenshot/receipt upload
+  transactionReference  String?            @map("transaction_reference") // User-provided reference
+  orderStatus           OrderStatus        @default(PENDING) @map("order_status")
+  approvedBy            String?            @map("approved_by") // Admin ID who approved
+  approvedAt            DateTime?          @map("approved_at")
+  rejectedReason        String?            @db.Text @map("rejected_reason")
+  notes                 String?            @db.Text // Admin notes
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @updatedAt @map("updated_at")
+
+  // Relations
+  user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([orderStatus])
+  @@map("subscription_orders")
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+} 
+
+// 11. Admin Activity Logs Table
+model AdminActivityLog {
+  id          Int      @id @default(autoincrement())
+  adminId     String   @map("admin_id")
+  actionType  String   @map("action_type")
+  targetType  String   @map("target_type") // 'book', 'category', 'user', etc.
+  targetId    Int?     @map("target_id")
+  description String?  @db.Text
+  ipAddress   String?  @map("ip_address")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  admin       User     @relation(fields: [adminId], references: [id])
+
+  @@index([adminId])
+  @@map("admin_activity_logs")
+}
+
+
+
+
+
+
 
 
 
