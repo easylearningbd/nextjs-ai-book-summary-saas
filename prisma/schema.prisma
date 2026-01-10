@@ -8,3 +8,42 @@ datasource db {
 
 
 // 1. Users Table - Main Users Table
+
+model User {
+  id                    String @id @default(uuid())
+  email                 String @unique
+  passwordHash          String @map("password_hash")
+  fullName              String @map("full_name")
+  role                  UserRole @default(USER)
+  subscriptionTier      SubscriptionTier @default(FREE) @map("subscription_tier")
+  subscriptionStatus    SubscriptionStatus @default(INACTIVE) @map("subscription_status")
+  subscriptionStartDate  DateTime? @map("subscription_start_date")
+  subscriptionEndDate    DateTime? @map("subscription_end_date")
+  stripeCustomerId       String? @map("stripe_customer_id")
+  stripeSubscriptionId   String? @map("stripe_subscription_id")
+  audioListenTime        Int       @default(0) @map("audio_listen_time") 
+  emailVerified          Boolean   @default(false) @map("email_verified")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+
+  @@map("users")
+
+}
+
+enum UserRole {
+  USER 
+  ADMIN
+}
+enum SubscriptionTier {
+  FREE 
+  MONTHLY
+  YEARLY
+  LIFETIME
+}
+
+enum SubscriptionStatus {
+  ACTIVE 
+  INACTIVE
+  EXPIRED
+  CANCELLED
+}
