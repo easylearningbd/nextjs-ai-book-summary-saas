@@ -321,6 +321,27 @@ model AdminActivityLog {
 }
 
 
+// 12. System Settings Table
+model SystemSetting {
+  id           Int      @id @default(autoincrement())
+  settingKey   String   @unique @map("setting_key")
+  settingValue String   @db.Text @map("setting_value")
+  settingType  SettingType @map("setting_type")
+  description  String?  @db.Text
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
+
+enum SettingType {
+  STRING
+  NUMBER
+  BOOLEAN
+  JSON
+}
+
+
+
 
 
 
