@@ -1,9 +1,10 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import { prisma } from "@/lib/db/prisma";
 import bcrypt from "bcryptjs";
 import { UserRole, SubscriptionTier } from "@prisma/client";
-import { email } from "zod";
+
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     adapter: PrismaAdapter(prisma), 
@@ -51,7 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             email: user.email,
             name: user.fullName,
             role: user.role,
-            subscriptiontier: user.subscriptionTier
+            subscriptionTier: user.subscriptionTier
              }; 
            },
         }),
