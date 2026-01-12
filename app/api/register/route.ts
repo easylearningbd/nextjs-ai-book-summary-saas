@@ -32,10 +32,46 @@ export async function POST(request:NextRequest){
         }
 
         // Hash Password 
+    const passwordHash = await bcrypt.hash(validatedData.password, 10);
 
+    // Create User 
+    const user = await prisma.user.create({
+        data: {
+            email: validatedData.email,
+            fullName: validatedData.fullName,
+            passwordHash,
+            role: "USER",
+            subscriptionTier: "FREE",
+            subscriptionStatus: "ACTIVE",
+        },
+        select: {
+            id: true,
+            email: true,
+            fullName: true,
+            role: true,
+            subscriptionTier: true,
+            createdAt: true
+        },
+    });
 
-        
+    return NextResponse.json(
+        {
+            message: "User created successfully",
+            user,
+        },
+        { status: 201 }
+    );        
     } catch (error) {
-        
+        if (error instanceof z.ZodError) {
+            return NextResponse.json(
+                {error: error.issues[0].message},
+                {status: 400}
+            );
+        }
+    console.error("Register error:", error);
+    return NextResponse.json(
+        {error: "Something went worng. Please try again"},
+        {status: 500}
+      );
     }
 }
