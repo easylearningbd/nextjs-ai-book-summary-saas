@@ -25,15 +25,26 @@ export default function LoginPage(){
             setLoading(true);
 
     try {
-        
-    } catch (error) {
-        
-    }
- 
+        const result = await signIn("credentials", {
+            email: formData.email,
+            password: formData.password,
+            redirect: false,
+        });
 
-    }
+        if (result?.error) {
+            throw new Error("Invalid email or password");
+        }
 
+        // Redireact to dashboard after successfully login 
+        router.push("/dashboard");
+        router.refresh();        
+    } catch (err: any) {
+        setError(err.message)
+    } finally{
+         setLoading(false);
+     } 
 
+    };
 
 
     return ( 
@@ -60,20 +71,22 @@ export default function LoginPage(){
 {/* Login Form */}
 <div className="bg-white rounded-2xl shadow-xl p-8">
     
+    {registered && (
     <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
         <p className="text-green-700 text-sm">
         ✓ Account created successfully! Please sign in.
         </p>
     </div>
+     )} 
     
-
-    
+     {error && (
     <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-red-700 text-sm">error</p>
+        <p className="text-red-700 text-sm">{error}</p>
     </div>
+     )} 
     
 
-    <form  className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
     <div>
         <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
         Email Address
@@ -82,8 +95,8 @@ export default function LoginPage(){
         id="email"
         type="email"
         required
-        value="email"
-            
+        value={formData.email}
+        onChange={(e) => setFormData({ ...formData, email: e.target.value }) }    
         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
         placeholder="john@example.com"
         />
@@ -105,8 +118,8 @@ export default function LoginPage(){
         id="password"
         type="password"
         required
-        value="password"
-            
+        value={formData.password}
+        onChange={(e) => setFormData({ ...formData, password: e.target.value }) }    
         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
         placeholder="••••••••"
         />
@@ -114,9 +127,10 @@ export default function LoginPage(){
 
     <button
         type="submit" 
+        disabled={loading}
         className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02]"
     >
-        Sign In
+        { loading ? "Signing in..." : "Sign In" }  
     </button>
     </form>
 
