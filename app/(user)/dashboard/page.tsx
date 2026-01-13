@@ -40,6 +40,7 @@ export default function DashboardPage(){
         const response = await fetch("/api/user/profile");
         if (response.ok) {
             const data = await response.json();
+           // console.log("User data:", data);  
             setUser(data);
         } else {
             const sessionResponse = await fetch("/api/auth/session");
