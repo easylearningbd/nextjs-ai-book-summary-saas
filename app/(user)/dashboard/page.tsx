@@ -140,6 +140,19 @@ if (!user) {
 const benefits = getTierBenefits(user.subscriptionTier);
 const pendingOrder = orders.find((o) => o.orderStatus === "PENDING");
 
+const handleSignOut = async () => {
+    try {
+        const response = await fetch("/api/auth/signout",{
+            method: "POST"
+        });
+        if (response.ok) {
+            window.location.href = "/";
+        }
+    } catch (error) {
+        console.error("Sign out error", error);
+    }
+};
+
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -187,6 +200,7 @@ const pendingOrder = orders.find((o) => o.orderStatus === "PENDING");
                 <p className="text-xs text-gray-600">{ user.email }</p>
               </div>
               <button 
+               onClick={handleSignOut}
                 className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Sign Out
