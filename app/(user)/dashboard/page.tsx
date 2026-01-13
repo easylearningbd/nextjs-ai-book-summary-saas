@@ -72,8 +72,73 @@ export default function DashboardPage(){
   }
     // End fetchOrders
 
+    const formatListenTime = (seconds: number) => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        return `${hours}h ${minutes}m`;
+    };
 
+const getTierColor = (tier: string) => {
+    switch (tier) {
+        case "LIFETIME":
+            return "from-purple-600 to-pink-600";
+        case "YEARLY" :
+            return "from-blue-600 to-indigo-600"; 
+        case "MONTHLY" :
+            return "from-green-600 to-emerald-600";  
+        default:
+            return "from-gray-600 to-gray-700";  
+    }
+};
 
+const getTierBenefits = (tier: string) => {
+    if (tier === "FREE") {
+        return {
+            title: "Free Tier",
+            features: [
+                "Browse all books catalog",
+                "Read book descriptions",
+                "View table of contents",
+                "Listen to ONLY 10 seconds of audio",
+                "Add reviews and ratings",
+            ],
+            limitations: [
+                "Cannot listen to full audio",
+                "Cannot download PDFs",
+                "No favorites feature",
+            ],
+        }; 
+    } else {
+         return {
+            title: `${tier} Plan`,
+            features: [
+               "Full access to 10,000+ book summaries",
+                "Read complete summaries online",
+                "Listen to full audio summaries",
+                "Download PDFs",
+                "Add books to favorites",
+                "Unlimited access",
+            ],
+            limitations: [],
+        };
+    }
+};
+
+if (loading) {
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="text-xl">Loading...</div>
+        </div>
+    );
+}
+
+if (!user) {
+    router.push("/login");
+    return null;
+}
+
+const benefits = getTierBenefits(user.subscriptionTier);
+const pendingOrder = orders.find((o) => o.orderStatus === "PENDING");
 
 
     return (
