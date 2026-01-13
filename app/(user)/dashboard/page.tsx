@@ -36,12 +36,40 @@ export default function DashboardPage(){
   },[]);
 
   async function fetchUserData(){
-
+    try {
+        const response = await fetch("/api/user/profile");
+        if (response.ok) {
+            const data = await response.json();
+            setUser(data);
+        } else {
+            const sessionResponse = await fetch("/api/auth/session");
+            if (sessionResponse.ok) {
+                const sessionData = await sessionResponse.json();
+                if (sessionData.user) {
+                   setUser(sessionData.user) ;
+                }
+            }
+        }
+        setLoading(false);
+    } catch (error) {
+        console.error("Failed to fetch user data:", error);
+         setLoading(false);
+    }
   }
+  // End fetchUserData
 
     async function fetchOrders(){
-    
+        try {
+            const response = await fetch("/api/subscription/orders");
+            if (response.ok) {
+                const data = await response.json();
+                setOrders(data);
+            }
+        } catch (error) {
+             console.error("Failed to fetch Order data:", error);
+        }    
   }
+    // End fetchOrders
 
 
 
