@@ -183,8 +183,8 @@ const pendingOrder = orders.find((o) => o.orderStatus === "PENDING");
             </div>
             <div className="flex items-center space-x-4">
               <div className="hidden md:block text-right">
-                <p className="text-sm font-medium text-gray-900">fullName</p>
-                <p className="text-xs text-gray-600">email</p>
+                <p className="text-sm font-medium text-gray-900">{ user.fullName }</p>
+                <p className="text-xs text-gray-600">{ user.email }</p>
               </div>
               <button 
                 className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -200,90 +200,94 @@ const pendingOrder = orders.find((o) => o.orderStatus === "PENDING");
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Welcome Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900">Welcome back, fullName!</h1>
+          <h1 className="text-4xl font-bold text-gray-900">Welcome back, { user.fullName }!</h1>
           <p className="text-gray-600 mt-2">Manage your subscription and track your learning progress</p>
         </div>
 
         {/* Pending Order Alert */}
-         
-          <div className="mb-8 bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-            <div className="flex items-start">
-              <svg className="w-6 h-6 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-              <div className="ml-3 flex-1">
-                <h3 className="text-lg font-bold text-yellow-900">Payment Under Review</h3>
-                <p className="text-yellow-700 mt-1">
-                  Your planType subscription payment (amount) is being reviewed by our team.
-                  You'll receive an email once your subscription is activated (usually within 24 hours).
-                </p>
-              </div>
-            </div>
-          </div>
+    {pendingOrder && (     
+    <div className="mb-8 bg-yellow-50 border border-yellow-200 rounded-xl p-6">
+    <div className="flex items-start">
+        <svg className="w-6 h-6 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <div className="ml-3 flex-1">
+        <h3 className="text-lg font-bold text-yellow-900">Payment Under Review</h3>
+        <p className="text-yellow-700 mt-1">
+            Your {pendingOrder.planType} subscription payment (${pendingOrder.amount}) is being reviewed by our team.
+            You'll receive an email once your subscription is activated (usually within 24 hours).
+        </p>
+        </div>
+    </div>
+    </div>
+    )} 
      
 
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Subscription Card */}
-          <div className="lg:col-span-1">
-            <div className={`bg-gradient-to-br  rounded-2xl p-8 text-white shadow-xl`}>
-              <div className="mb-6">
-                <p className="text-white/80 text-sm mb-2">Current Plan</p>
-                <h2 className="text-3xl font-bold">title</h2>
-              </div>
+    {/* Left Column - Subscription Card */}
+    <div className="lg:col-span-1">
+    <div className={`bg-gradient-to-br ${getTierColor(user.subscriptionTier)} rounded-2xl p-8 text-white shadow-xl`}>
+        <div className="mb-6">
+        <p className="text-white/80 text-sm mb-2">Current Plan</p>
+        <h2 className="text-3xl font-bold">{benefits.title}</h2>
+        </div>
 
-              <div className="mb-6 pb-6 border-b border-white/20">
-                <p className="text-white/80 text-sm mb-1">Status</p>
-                <p className="text-xl font-semibold">
-                 ✓ Active
-                </p>
-              </div>
+        <div className="mb-6 pb-6 border-b border-white/20">
+        <p className="text-white/80 text-sm mb-1">Status</p>
+        <p className="text-xl font-semibold">
+            { user.subscriptionStatus === "ACTIVE" ? "✓ Active" : user.subscriptionStatus } 
+        </p>
+        </div>
 
-               
-                <div className="mb-6 pb-6 border-b border-white/20">
-                  <p className="text-white/80 text-sm mb-1">Renews On</p>
-                  <p className="text-lg font-semibold">
-                    subscriptionEndDate
-                  </p>
-                </div>
-               
+    {user.subscriptionEndDate && user.subscriptionTier !== "LIFETIME" && (          
+    <div className="mb-6 pb-6 border-b border-white/20">
+        <p className="text-white/80 text-sm mb-1">Renews On</p>
+        <p className="text-lg font-semibold">
+         {new Date(user.subscriptionEndDate).toLocaleDateString()}
+        </p>
+    </div>
+     )} 
+    
 
-              
-                <Link
-                  href="/pricing"
-                  className="block w-full py-3 bg-white text-indigo-600 rounded-lg font-bold text-center hover:bg-gray-100 transition-colors"
-                >
-                  Upgrade to Premium
-                </Link>
+      {user.subscriptionTier === "FREE" && (       
+    <Link
+        href="/pricing"
+        className="block w-full py-3 bg-white text-indigo-600 rounded-lg font-bold text-center hover:bg-gray-100 transition-colors"
+    >
+        Upgrade to Premium
+    </Link>
+    )}  
              
 
-              
-                <Link
-                  href="/pricing"
-                  className="block w-full py-3 bg-white/20 text-white rounded-lg font-bold text-center hover:bg-white/30 transition-colors"
-                >
-                  Change Plan
-                </Link>
+     {user.subscriptionTier !== "FREE" && user.subscriptionTier !== "LIFETIME" && (   
+    <Link
+        href="/pricing"
+        className="block w-full py-3 bg-white/20 text-white rounded-lg font-bold text-center hover:bg-white/30 transition-colors"
+    >
+        Change Plan
+    </Link>
+    )}   
                
             </div>
 
             {/* Quick Stats */}
-            <div className="mt-6 bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Your Stats</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Total Listen Time</span>
-                  <span className="font-semibold text-gray-900">audioListenTime</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Member Since</span>
-                  <span className="font-semibold text-gray-900">
-                   createdAt
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="mt-6 bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Your Stats</h3>
+        <div className="space-y-3">
+        <div className="flex justify-between items-center">
+            <span className="text-gray-600">Total Listen Time</span>
+            <span className="font-semibold text-gray-900">{formatListenTime(user.audioListenTime)}</span>
+        </div>
+        <div className="flex justify-between items-center">
+            <span className="text-gray-600">Member Since</span>
+            <span className="font-semibold text-gray-900">
+            {new Date(user.createdAt).toLocaleDateString()}
+            </span>
+        </div>
+        </div>
+    </div>
+    </div>
 
           {/* Right Column - Benefits and Recent Orders */}
           <div className="lg:col-span-2 space-y-6">
