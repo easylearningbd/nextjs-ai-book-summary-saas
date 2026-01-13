@@ -290,123 +290,127 @@ const pendingOrder = orders.find((o) => o.orderStatus === "PENDING");
     </div>
 
           {/* Right Column - Benefits and Recent Orders */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Plan Benefits */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Plan Includes</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             
-                  <div   className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-green-600 mt-0.5 mr-3 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span className="text-gray-700">feature</span>
-                  </div>
-                
-                
-                  <div  className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-red-500 mt-0.5 mr-3 flex-shrink-0"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                    <span className="text-gray-500">limitation</span>
-                  </div>
-                
-              </div>
-
-              
-                <div className="mt-8 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Ready to Unlock Full Access?</h3>
-                  <p className="text-gray-700 mb-4">
-                    Upgrade to premium and get unlimited access to 10,000+ book summaries, full audio, and PDF downloads.
-                  </p>
-                  <Link
-                    href="/pricing"
-                    className="inline-block px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg"
-                  >
-                    View Plans & Pricing
-                  </Link>
-                </div>
-              
+    <div className="lg:col-span-2 space-y-6">
+    {/* Plan Benefits */}
+    <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Plan Includes</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {benefits.features.map((feature, index) =>( 
+            <div key={index} className="flex items-start">
+            <svg
+                className="w-6 h-6 text-green-600 mt-0.5 mr-3 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+                />
+            </svg>
+            <span className="text-gray-700">{feature}</span>
             </div>
-
-            {/* Recent Orders */}
-            
-              <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Subscription History</h2>
-                <div className="space-y-4">
-                  
-                    <div
-                      
-                      className="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
-                    >
-                      <div>
-                        <p className="font-semibold text-gray-900">  Plan</p>
-                        <p className="text-sm text-gray-600">
-                        createdAt
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-gray-900">$amount</p>
-                        <span
-                          className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold "bg-green-100 text-green-700"    
-                           `}
-                        >
-                         orderStatus
-                        </span>
-                      </div>
-                    </div>
-                   
-                </div>
-              </div>
-            
-
-            {/* Quick Actions */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Link
-                  href="/books"
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-colors"
-                >
-                  <div className="flex items-center">
-                    <span className="text-3xl mr-3">📚</span>
-                    <span className="font-semibold text-gray-900">Browse Books</span>
-                  </div>
-                  <span className="text-gray-400">→</span>
-                </Link>
-                <Link
-                  href="/favorites"
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-colors"
-                >
-                  <div className="flex items-center">
-                    <span className="text-3xl mr-3">❤️</span>
-                    <span className="font-semibold text-gray-900">My Favorites</span>
-                  </div>
-                  <span className="text-gray-400">→</span>
-                </Link>
-              </div>
+            ))} 
+        
+        {benefits.limitations.map((limitation, index) =>( 
+            <div key={index} className="flex items-start">
+            <svg
+                className="w-6 h-6 text-red-500 mt-0.5 mr-3 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+            >
+                <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+                />
+            </svg>
+            <span className="text-gray-500">{limitation}</span>
             </div>
-          </div>
+         ))} 
+        </div>
+
+        {user.subscriptionTier === "FREE" && (
+        <div className="mt-8 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Ready to Unlock Full Access?</h3>
+            <p className="text-gray-700 mb-4">
+            Upgrade to premium and get unlimited access to 10,000+ book summaries, full audio, and PDF downloads.
+            </p>
+            <Link
+            href="/pricing"
+            className="inline-block px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg"
+            >
+            View Plans & Pricing
+            </Link>
+        </div>
+        )}
+        
+    </div>
+
+    {/* Recent Orders */}
+       {orders.length > 0 && ( 
+        <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Subscription History</h2>
+        <div className="space-y-4">
+            {orders.slice(0,5).map((order) => ( 
+            <div key={order.id}                
+                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg" >
+                <div>
+                <p className="font-semibold text-gray-900">{order.planType}  Plan</p>
+                <p className="text-sm text-gray-600">
+                {new Date(order.createdAt).toLocaleDateString()}
+                </p>
+                </div>
+                <div className="text-right">
+                <p className="font-semibold text-gray-900">${order.amount}</p>
+                <span
+                    className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${order.orderStatus === "APPROVED"
+                        ? "bg-green-100 text-green-700"
+                        : order.orderStatus === "PENDING"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-red-100 text-red-700"
+                     }`} 
+                     >
+                    {order.orderStatus}
+                </span>
+                </div>
+            </div>
+            ))}
+        </div>
+        </div>
+    )}
+
+    {/* Quick Actions */}
+    <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Link
+            href="/books"
+            className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-colors"
+        >
+            <div className="flex items-center">
+            <span className="text-3xl mr-3">📚</span>
+            <span className="font-semibold text-gray-900">Browse Books</span>
+            </div>
+            <span className="text-gray-400">→</span>
+        </Link>
+        <Link
+            href="/favorites"
+            className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-colors"
+        >
+            <div className="flex items-center">
+            <span className="text-3xl mr-3">❤️</span>
+            <span className="font-semibold text-gray-900">My Favorites</span>
+            </div>
+            <span className="text-gray-400">→</span>
+        </Link>
+        </div>
+    </div>
+    </div>
         </div>
       </div>
     </div>
