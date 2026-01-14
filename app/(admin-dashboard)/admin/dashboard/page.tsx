@@ -61,7 +61,7 @@ export default async function AdminDashboardPage(){
     <div className="mb-8">
     <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
     <p className="text-gray-600 mt-2">
-        Welcome back, name
+        Welcome back, {session.user.name || "Admin"}
     </p>
     </div>
 
@@ -73,7 +73,7 @@ export default async function AdminDashboardPage(){
         <div>
             <p className="text-sm font-medium text-gray-600">Total Books</p>
             <p className="text-3xl font-bold text-gray-900 mt-2">
-            totalBooks
+            {totalBooks}
             </p>
         </div>
         <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
@@ -88,7 +88,7 @@ export default async function AdminDashboardPage(){
         <div>
             <p className="text-sm font-medium text-gray-600">Total Users</p>
             <p className="text-3xl font-bold text-gray-900 mt-2">
-            totalUsers
+            {totalUsers}
             </p>
         </div>
         <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -105,7 +105,7 @@ export default async function AdminDashboardPage(){
             Paid Subscribers
             </p>
             <p className="text-3xl font-bold text-gray-900 mt-2">
-            paidSubscriptions
+            {paidSubscriptions}
             </p>
         </div>
         <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -120,7 +120,7 @@ export default async function AdminDashboardPage(){
         <div>
             <p className="text-sm font-medium text-gray-600">Categories</p>
             <p className="text-3xl font-bold text-gray-900 mt-2">
-            totalCategories
+            {totalCategories}
             </p>
         </div>
         <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center">
@@ -138,35 +138,43 @@ export default async function AdminDashboardPage(){
         <h2 className="text-xl font-bold text-gray-900">Recent Users</h2>
         </div>
         <div className="p-6">
-        
+        {recentUsers.length === 0 ? ( 
             <p className="text-gray-500 text-center py-8">No users yet</p>
-        
+        ) : ( 
             <div className="space-y-4">
-                
+               {recentUsers.map((user) => ( 
                 <div
-                
+                key={user.id}
                 className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                 <div className="flex-1">
                     <p className="font-semibold text-gray-900">
-                    fullName
+                    {user.fullName || "No Name"}
                     </p>
-                    <p className="text-sm text-gray-600">email</p>
+                    <p className="text-sm text-gray-600">{user.email}</p>
                 </div>
                 <div className="text-right">
                     <span
-                    className={`inline-block px-3 py-1 rounded-full text-xs font-semibold   `}
+                    className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                        user.subscriptionTier === "LIFETIME"
+                        ? "bg-purple-100 text-purple-700"
+                        : user.subscriptionTier === "YEARLY"
+                        ? "bg-indigo-100 text-indigo-700"
+                        : user.subscriptionTier === "MONTHLY"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-gray-100 text-gray-700"
+                    }`}
                     >
-                    subscriptionTier
+                    {user.subscriptionTier}
                     </span>
                     <p className="text-xs text-gray-500 mt-1">
-                    createdAt
+                    {new Date(user.createdAt).toLocaleDateString()}
                     </p>
                 </div>
                 </div>
-                
+                ))} 
             </div>
-        
+          )}
         </div>
     </div>
 
