@@ -38,7 +38,24 @@ export default auth((req) => {
     }
 
     // Allow access to admin login page.
+    if (isAdminLoginPage) {
+        // If already logged in as admin, redireact to admin dashboard
+        if (isLoggedIn && isAdmin) {
+            return NextResponse.redirect(new URL("admin/dashboard", nextUrl.origin));
+        }
+        return NextResponse.next();        
+    }
 
+    /// Redireact to admin login if tryting to access amdin route and not as admin
+    if (isAdminRoute && (!isLoggedIn || !isAdmin)) {
+        return NextResponse.redirect(new URL("/admin/login", nextUrl.origin));
+    }
 
+    // Protect user dashboard
+    if (isAuthPage && isLoggedIn) {
+        return NextResponse.redirect(new URL("/dashboard", nextUrl.origin));
+    }
+
+    return NextResponse.next();
 
 });
