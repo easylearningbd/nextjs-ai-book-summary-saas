@@ -184,35 +184,39 @@ export default async function AdminDashboardPage(){
         <h2 className="text-xl font-bold text-gray-900">Recent Books</h2>
         </div>
         <div className="p-6">
-        
+        {recentBooks.length === 0 ? ( 
             <p className="text-gray-500 text-center py-8">No books yet</p>
-        
+        ) : ( 
             <div className="space-y-4">
-            
+            {recentBooks.map((book) => ( 
                 <div
-                
+                key={book.id}
                 className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                 <div className="flex-1">
                     <p className="font-semibold text-gray-900">
-                    title
+                   {book.title}
                     </p>
-                    <p className="text-sm text-gray-600">author</p>
+                    <p className="text-sm text-gray-600">{book.author}</p>
                 </div>
                 <div className="text-right">
                     <span
-                    className={`inline-block px-3 py-1 rounded-full text-xs font-semibold  `}
+                    className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                        book.isPublished
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    } `}
                     >
-                    PUBLISHED
+                    {book.isPublished ? "PUBLISHED" : "DRAFT"}  
                     </span>
                     <p className="text-xs text-gray-500 mt-1">
-                    createdAt
+                    {new Date(book.createdAt).toLocaleDateString()}
                     </p>
                 </div>
                 </div>
-            
+            ))}
             </div>
-        
+        )}
         </div>
     </div>
     </div>
