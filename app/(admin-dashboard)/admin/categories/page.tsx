@@ -24,8 +24,23 @@ export default function CategoriesPage(){
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] =  useState<number | null>(null);
 
+    useEffect(() => {
+        fetchCategories();
+    },[]);
+    
     async function fetchCategories(){
-        
+
+        try {
+            const response = await fetch("/api/admin/categories");
+            if (response.ok) {
+                const data = await response.json();
+                setCategories(data);
+            }
+            setLoading(false);
+        } catch (error) {
+            console.error("Failed to fetch categories", error);
+            setLoading(false);
+        }
     }
 
     return (
