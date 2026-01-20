@@ -33,8 +33,24 @@ async function main(){
   console.log('Categories seeded successfully');
 
   /// Cerate an admin user for testing
-  
 
+  const adminPassword = await bcrypt.hash('admin123',10);
+
+  await prisma.user.upsert({
+    where: { email: 'admin@bookwise.com'},
+    update: {},
+    create: {
+        email: 'admin@bookwise.com',
+        fullName: 'Admin User',
+        passwordHash: adminPassword,
+        role: 'ADMIN',
+        subscriptionTier: 'LIFETIME',
+        subscriptionStatus: 'ACTIVE',
+        emailVerified: true,
+    }
+  });
+
+  console.log('Admin user created successfully');
    
 }
 
