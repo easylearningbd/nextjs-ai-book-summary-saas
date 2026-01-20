@@ -31,8 +31,42 @@ export default function NewCategoryPage(){
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
-        
-    }
+        e.preventDefault();
+        setSaving(true);
+        setErrors({});
+
+        try {
+            const response = await fetch("/api/admin/categories",{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    description: formData.description || null,
+                    icon: formData.icon || null,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (data.errors) {
+                    setErrors(data.errors);
+                }else {
+                    setErrors({ general: data.error || "Failed to create category" });
+                }
+                setSaving(false);
+                return;
+            }
+        toast.success("Category created successfully!");
+        router.push("/admin/categories")
+        } catch (error) {
+            setErrors({ general: "An error occurred whiile createing the category"});
+            toast.error("An error occurred while creating the category");
+            setSaving(false);
+        }
+    };
 
 
 
