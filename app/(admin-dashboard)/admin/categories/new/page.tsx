@@ -30,6 +30,10 @@ export default function NewCategoryPage(){
         }));
     }
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        
+    }
+
 
 
     return (
@@ -39,12 +43,12 @@ export default function NewCategoryPage(){
     <p className="text-gray-600 mt-2">Create a new book category</p>
     </div>
 
-    <form className="space-y-6">
-    
+    <form onSubmit={handleSubmit} className="space-y-6">
+    {errors.general && ( 
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-        general
+        {errors.general}
         </div>
-    
+    )}
 
     {/* Category Information */}
     <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
@@ -59,14 +63,15 @@ export default function NewCategoryPage(){
             <input
             type="text"
             name="name" 
-
+            value={formData.name}
+            onChange={handleChange}
             required
             placeholder="e.g., Business, Self-Help, Technology"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
-            
-            <p className="mt-1 text-sm text-red-600">name</p>
-            
+            {errors.name && ( 
+            <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+            )}
         </div>
 
         <div>
@@ -75,14 +80,15 @@ export default function NewCategoryPage(){
             </label>
             <textarea
             name="description" 
-
+            value={formData.description}
+            onChange={handleChange}
             rows={3}
             placeholder="Brief description of this category"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
-            
+            {errors.description && ( 
             <p className="mt-1 text-sm text-red-600">description</p>
-            
+             )}
         </div>
 
         <div>
@@ -93,16 +99,18 @@ export default function NewCategoryPage(){
             <input
                 type="text"
                 name="icon"
-                
+                value={formData.icon}
+                onChange={handleChange}
                 placeholder="📚"
                 maxLength={10}
                 className="w-24 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-2xl"
             />
-            
+               {formData.icon && (
                 <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-600">Preview:</span>
-                <span className="text-3xl">icon</span>
+                <span className="text-3xl">{formData.icon}</span>
                 </div>
+                )}
             
             </div>
             <p className="mt-1 text-xs text-gray-500">
@@ -117,7 +125,8 @@ export default function NewCategoryPage(){
             <input
             type="number"
             name="displayOrder" 
-
+            value={formData.displayOrder}
+            onChange={handleChange}
             min="0"
             className="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
@@ -131,7 +140,8 @@ export default function NewCategoryPage(){
             type="checkbox"
             id="isActive"
             name="isActive" 
-
+            checked={formData.isActive}
+            onChange={handleChange}
             className="w-4 h-4 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500"
             />
             <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
@@ -145,18 +155,18 @@ export default function NewCategoryPage(){
     <div className="flex items-center justify-end space-x-4">
         <button
         type="button"
-            
+        onClick={() => router.back()}    
         className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
-        
+        disabled={saving}
         >
         Cancel
         </button>
         <button
         type="submit"
         className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg disabled:opacity-50"
-            
+        disabled={saving}   
         >
-        Create Category
+         {saving ? "Creating..." : "Create Category"} 
         </button>
     </div>
     </form>
