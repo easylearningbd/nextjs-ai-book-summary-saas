@@ -44,6 +44,15 @@ export default function CategoriesPage(){
         }
     }
 
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-xl">Loading...</div>
+            </div>
+        );
+    }
+
+
     return (
           <div>
       {/* Header */}
@@ -91,65 +100,69 @@ export default function CategoriesPage(){
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-             
-                <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
-                    No categories found. Create your first category to get started.
-                  </td>
-                </tr>
-              
-               
-                  <tr   className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                     
-                        <span className="text-2xl">icon</span>
-                      
-                        <span className="text-gray-400 text-sm">No icon</span>
-                     
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-semibold text-gray-900">name</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <code className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                       slug
-                      </code>
-                    </td>
+        {categories.length === 0 ? ( 
+            <tr>
+            <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
+                No categories found. Create your first category to get started.
+            </td>
+            </tr>
+        ) : (  
+            categories.map((category) => ( 
+            <tr key={category.id}  className="hover:bg-gray-50">
+            <td className="px-6 py-4 whitespace-nowrap">
+                {category.icon ? (
+                <span className="text-2xl">{category.icon}</span>
+                ): ( 
+                <span className="text-gray-400 text-sm">No icon</span>
+                )}
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap">
+                <div className="font-semibold text-gray-900">{category.name}</div>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap">
+                <code className="text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">
+                {category.slug}
+                </code>
+            </td>
+            
+            <td className="px-6 py-4 whitespace-nowrap">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {category._count?.books || 0} books
+                </span>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap">
+                <span className="text-sm text-gray-600"> {category.displayOrder}</span>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap">
+                <span
+                className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
+                    category.isActive
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-700"
+                }`} >
+                {category.isActive ? "Active" : "Inactive"}  
+                </span>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center space-x-3">
+                <Link
+                    href={`/admin/categories/${category.id}/edit`}
+                    className="text-indigo-600 hover:text-indigo-900 font-semibold text-sm"
+                >
+                    Edit
+                </Link>
+                <button
                     
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        0 books
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-600">displayOrder</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700`}
-                      >
-                       Active
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-3">
-                        <Link
-                          href={`/admin/categories/id/edit`}
-                          className="text-indigo-600 hover:text-indigo-900 font-semibold text-sm"
-                        >
-                          Edit
-                        </Link>
-                        <button
-                          
-                          
-                          className="text-red-600 hover:text-red-900 font-semibold text-sm disabled:opacity-50"
-                        >
-                         Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                
+                    
+                    className="text-red-600 hover:text-red-900 font-semibold text-sm disabled:opacity-50"
+                >
+                    Delete
+                </button>
+                </div>
+            </td>
+            </tr>
+            ))
+                ) }
              
             </tbody>
           </table>
@@ -160,18 +173,18 @@ export default function CategoriesPage(){
       <div className="mt-6 grid grid-cols-3 gap-6">
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Total Categories</div>
-          <div className="text-3xl font-bold text-gray-900">length</div>
+          <div className="text-3xl font-bold text-gray-900">{categories.length}</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Active Categories</div>
           <div className="text-3xl font-bold text-green-600">
-          isActive
+          {categories.filter((c) => c.isActive).length}
           </div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Total Books</div>
           <div className="text-3xl font-bold text-indigo-600">
-            books
+            {categories.reduce((sum, c) => sum + (c._count?.books || 0), 0)}
           </div>
         </div>
       </div>
