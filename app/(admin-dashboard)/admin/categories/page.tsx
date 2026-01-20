@@ -27,13 +27,14 @@ export default function CategoriesPage(){
     useEffect(() => {
         fetchCategories();
     },[]);
-    
+
     async function fetchCategories(){
 
         try {
             const response = await fetch("/api/admin/categories");
             if (response.ok) {
                 const data = await response.json();
+                //console.log("Categories data:", data);   
                 setCategories(data);
             }
             setLoading(false);
