@@ -129,3 +129,52 @@ export async function PUT(
         console.error("Error updating category:", error);
     }
 }
+
+
+export async function DELETE(
+    request: NextRequest,
+     { params } : { params: Promise<{ id: string} > }
+) {
+    try {
+        const session = await auth();
+
+        if (!session?.user || session.user.role !== "ADMIN") {
+            return NextResponse.json({ error: "Unauthorized"}, { status: 401});
+        }
+
+        const {id} = await params;
+
+        // check if category exists 
+        const category = await prisma.category.findUnique({
+            where: { id: parseInt(id)},
+            include: {
+                _count:{
+                    select: {
+                        books: true,
+                    },
+                },
+            },
+        });
+
+        if (!category) {
+            return NextResponse.json({error: "Category not found"}, {status: 404});
+        }
+
+        // check if category has any books
+        if (category._count.books > 0) {
+            return NextResponse.json(
+                {error: `Cannot delete cateogy. It contanis ${category._count.books} books `},
+                {status: 400}
+            );
+        }
+
+        // Delete category
+        await prisma.category.delete({
+            where: { id: parseInt(id) },
+        });
+
+        return NextResponse.json({ message: "Category deleted successfylly"});        
+    } catch (error) {
+        console.error("Error deleting category", error);
+    }
+}
