@@ -113,6 +113,22 @@ useEffect(() => {
     };
 
 
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-xl">Loading...</div>
+            </div>
+        );
+    }
+
+    if (!category) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-xl">Category not found</div>
+            </div>
+        );
+        
+    }
 
 
 
@@ -246,7 +262,7 @@ useEffect(() => {
         className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg disabled:opacity-50"
         disabled={saving}   
         >
-         {saving ? "Creating..." : "Create Category"} 
+         {saving ? "Saving..." : "Save Category"} 
         </button>
     </div>
     </form>
