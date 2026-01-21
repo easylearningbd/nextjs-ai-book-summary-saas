@@ -79,7 +79,7 @@ export default async function AdminBookPage(){
 
       {/* Books Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-       
+       {books.length === 0 ? (
           <div className="p-12 text-center">
             <div className="text-6xl mb-4">📚</div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -95,7 +95,7 @@ export default async function AdminBookPage(){
               + Add New Book
             </Link>
           </div>
-        
+        ) : ( 
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
@@ -123,69 +123,72 @@ export default async function AdminBookPage(){
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              
+              {books.map((book) => ( 
                 <tr
-                  
+                  key={book.id}
                   className="hover:bg-gray-50 transition-colors"
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
-                      
+                      {book.coverImageUrl ? ( 
                         <img
-                          src="" 
-                          
+                          src={book.coverImageUrl} 
+                          alt={book.title}
                           className="w-12 h-16 object-cover rounded"
                         />
-                     
+                     ) : ( 
                         <div className="w-12 h-16 bg-gray-200 rounded flex items-center justify-center">
                           <span className="text-2xl">📖</span>
                         </div>
-                      
+                      )}
                       <div>
                         <p className="font-semibold text-gray-900">
-                        title
+                       {book.title}
                         </p>
-                        <p className="text-sm text-gray-600">author</p>
+                        <p className="text-sm text-gray-600">{book.author}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <span className="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
-                     category
+                     {book.category?.name || "Uncategorized"}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <span
-                      className={`inline-block px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700`}
+                      className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${book.isPublished
+                        ? "bg-green-100 text-green-700"
+                        : "bg-yellow-100 text-yellow-700"
+                      } `}
                     >
-                      PUBLISHED
+                     {book.isPublished ? "PUBLISHED" : "DRAFT"}  
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    
+                    {book.audioGenerated ? ( 
                       <span className="text-green-600 font-medium">✓ Yes</span>
-                    
+                    ) : (
                       <span className="text-gray-400">✗ No</span>
-                    
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-gray-700 font-medium">
-                    reviews
+                    {book._count.reviews}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    createdAt
+                    {new Date(book.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end space-x-2">
                       <Link
-                        href={`/admin/books/id/details`}
+                        href={`/admin/books/${book.id}/details`}
                         className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
                       >
                         View
                       </Link>
                       <Link
-                        href={`/admin/books/id/edit`}
+                        href={`/admin/books/${book.id}/edit`}
                         className="px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors text-sm font-medium"
                       >
                         Edit
@@ -196,10 +199,10 @@ export default async function AdminBookPage(){
                     </div>
                   </td>
                 </tr>
-              
+              ))}
             </tbody>
           </table>
-        
+        )}
       </div>
     </div>
     );
