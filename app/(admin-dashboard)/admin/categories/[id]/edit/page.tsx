@@ -37,11 +37,29 @@ export default function EditCategoryPage(){
     
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    useEffect(() => {
-        async function fetchCategory() {
-
+useEffect(() => {
+    async function fetchCategory() {
+        try {
+            const response = await fetch(`/api/admin/categories/${categoryId}`);
+            if (response.ok) {
+                const data = await response.json();
+                setCategory(data);
+                setFormData({
+                    name: data.name,
+                    description: data.description || "",
+                    icon: data.icon || "",
+                    displayOrder: data.displayOrder,
+                    isActive: data.isActive,
+                });
+            }
+            setLoading(false);
+        } catch (error) {
+            console.error("Failed to fetch category", error);
+            setLoading(false);
         }
-    },[]);
+    }
+    fetchCategory();
+},[categoryId]);
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement >
