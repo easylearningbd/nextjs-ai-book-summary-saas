@@ -44,6 +44,37 @@ export default function CategoriesPage(){
         }
     }
 
+
+    async function handleDelete(id: number, name: string){
+        if (!confirm(`Are your sure you want to delete "${name}"? This action cannot be undone`)) {
+            return;
+        }
+        setDeleting(id);
+        try {
+            const response = await fetch(`/api/admin/categories/${id}`, {
+                method: "DELETE",
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                toast.error(data.error || "Failed to delete category");
+                setDeleting(null);
+                return;
+            }
+
+            toast.success("Category deleted successfully");
+            fetchCategories();
+        } catch (error) {
+            toast.error("An error occurred while deleting the category");
+        }finally{
+            setDeleting(null);
+        } 
+    }
+
+
+
+
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -51,7 +82,7 @@ export default function CategoriesPage(){
             </div>
         );
     }
-
+ 
 
     return (
           <div>
@@ -152,11 +183,11 @@ export default function CategoriesPage(){
                     Edit
                 </Link>
                 <button
-                    
-                    
+                    onClick={() => handleDelete(category.id,category.name)}
+                    disabled={deleting === category.id}
                     className="text-red-600 hover:text-red-900 font-semibold text-sm disabled:opacity-50"
                 >
-                    Delete
+                   {deleting === category.id ? "Deleting..." : "Delete" } 
                 </button>
                 </div>
             </td>
