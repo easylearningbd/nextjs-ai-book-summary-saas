@@ -69,15 +69,41 @@ export async function POST(request: NextRequest){
     }
 
     const data = validation.data;
-
+ 
     /// Generate slug from name 
+    const slug = data.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
 
+    // check if slug already exists
+    const existingCategory = await prisma.category.findUnique({
+        where: {slug},
+    });
 
-
-    } catch (error) {
-        
+    if (existingCategory) {
+        return NextResponse.json(
+            {error: "A category with this name already exists"},
+            {status: 400}
+        );
     }
 
+    // Create Category 
+    const category = await prisma.category.create({
+        data: {
+            name: data.name,
+            slug: slug,
+            description: data.description,
+            icon: data.icon,
+            displayOrder:  data.displayOrder,
+            isActive: data.isActive
+        },
+    });
 
+    return NextResponse.json(category, {status:201});
+    } catch (error) {
+        console.error("Error creating category:", error);
+    }
 
+    
 }
