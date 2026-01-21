@@ -4,6 +4,15 @@ import { error } from "console";
 import { NextRequest,NextResponse } from "next/server";
 import { z } from "zod";
 
+const categorySchema = z.object({
+
+    name: z.string().min(1, "Name is required"),
+    description: z.string().nullable().optional(),
+    icon: z.string().nullable().optional(),
+    displayOrder: z.number().int().default(0),
+    isActive: z.boolean().default(true),
+});
+
 export async function GET(request: NextRequest){
     try {
         const session = await auth();
@@ -31,4 +40,44 @@ export async function GET(request: NextRequest){
             {status: 500}
         );
     }
+}
+
+
+export async function POST(request: NextRequest){
+    try {
+        const session = await auth();
+
+    if (!session?.user || session.user.role !== "ADMIN") {
+            return NextResponse.json({ error: "Unauthorized"}, { status: 401});
+        }
+
+    const body = await request.json();
+
+    /// Validate request body 
+    const validation = categorySchema.safeParse(body);
+    if (!validation.success) {
+        const errors: Record<string, string> = {};
+        validation.error.issues.forEach((issue) => {
+            if (issue.path[0]) {
+                errors[issue.path[0].toString()] = issue.message;
+            }
+        });
+        return NextResponse.json(
+            {error: "Vlaidation filed", errors},
+            { status: 400}
+        );
+    }
+
+    const data = validation.data;
+
+    /// Generate slug from name 
+
+
+
+    } catch (error) {
+        
+    }
+
+
+
 }
