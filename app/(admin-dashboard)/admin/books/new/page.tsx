@@ -134,17 +134,49 @@ export default function AddNewBookPage(){
 
 
     // Create book 
-    
+    const response = await fetch("/api/admin/books",{
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            title: formData.title,
+            author: formData.author,
+            categoryId: parseInt(formData.categoryId),
+            description: formData.description,
+            publicationYear: formData.publicationYear ? parseInt(formData.publicationYear) : null,
+            isbn: formData.isbn || null,
+            tags: formData.tags || null,
+            coverImageUrl: coverImageUrl || null,
+            pdfUrl: pdfUrl || null,
+            isFeatured: formData.isFeatured,
+            isPublished: formData.isPublished,
 
+        }),
+     });
 
+     const data = await response.json();
+     if (!response.ok) {
+        if (data.errors) {
+            setErrors(data.errors);
+        }else {
+           setErrors({ general: data.error || "Failed to create book" }); 
+        }
+        setLoading(false);
+        return;
+     }
+     // Save book id for summary and audio generation 
+     setBookId(data.id);
+     setLoading(false);
 
+     // Show success messsage
+     toast.success("Book created successfully! You can now generate summary and audio");
     } catch (error) {
-        
-    }
+       setErrors({ general: "Failed to create book" }); 
+        setLoading(false);
+     } 
 
-
-
-    }
+    };
 
 
     return (
