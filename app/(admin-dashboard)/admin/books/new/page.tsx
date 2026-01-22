@@ -22,9 +22,51 @@ export default function AddNewBookPage(){
     const [audioProgress, setAudioProgress] = useState("");
     const [bookId, setBookId] = useState<number | null>(null);
 
+    const [formData, setFormData] = useState({
+        title: "",
+        author: "",
+        categoryId: "",
+        description: "",
+        publicationYear: "",
+        isbn: "",
+        tags: "",
+        isFeatured: false,
+        isPublished: false,
+    });
 
+    const [errors, setErrors] = useState<Record<string,string>>({});
 
+    /// Fetch categories 
+    useEffect(() => {
+        async function fetchCategories(){
+            try {
+                const response = await fetch("/api/admin/categories");
+                if (response.ok) {
+                    const data = await response.json();
+                    setCategories(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch categories", error);
+            }
+        }
+        fetchCategories();
+    },[]);
 
+     const handleChange = (
+            e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement >
+        ) => {
+            const { name, value, type } = e.target;
+            const checked = (e.target as HTMLInputElement).checked;
+    
+            setFormData((prev) => ({
+                ...prev,
+                [name]: type === "checkbox" ? checked : value, 
+            }));
+
+            if (errors[name]) {
+                setErrors((prev) => ({ ...prev, [name]: ""}));
+            }
+        } 
 
 
     return (
@@ -39,9 +81,11 @@ export default function AddNewBookPage(){
       <div>
         <form  className="space-y-6">
           
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-             general
-            </div>
+       {errors.general && ( 
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        {errors.general}
+        </div>
+        )}
           
 
           {/* Book Information */}
@@ -58,8 +102,8 @@ export default function AddNewBookPage(){
                   <input
                     type="text"
                     name="title"
-                    value="title" 
-
+                    value={formData.title} 
+                    onChange={handleChange}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="Enter book title"
@@ -73,8 +117,8 @@ export default function AddNewBookPage(){
                   <input
                     type="text"
                     name="author"
-                    value="author" 
-
+                    value={formData.author} 
+                    onChange={handleChange}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="Enter author name"
@@ -88,16 +132,17 @@ export default function AddNewBookPage(){
                 </label>
                 <select
                   name="categoryId"
-                  value="categoryId" 
+                  value={formData.categoryId} 
+                  onChange={handleChange}
                   required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 >
                   <option value="">Select a category</option>
-                 
-                    <option >
-                    name
+                {categories.map((category) => ( 
+                    <option key={category.id} value={category.id}>
+                    {category.name}
                     </option>
-                  
+                  ))} 
                 </select>
               </div>
 
@@ -107,8 +152,8 @@ export default function AddNewBookPage(){
                 </label>
                 <textarea
                   name="description"
-                  value="description" 
-
+                  value={formData.description} 
+                  onChange={handleChange}
                   required
                   rows={4}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -162,8 +207,8 @@ export default function AddNewBookPage(){
                   <input
                     type="number"
                     name="publicationYear"
-                    value="publicationYear" 
-
+                    value={formData.publicationYear} 
+                    onChange={handleChange}
                     min="1900"
                     max={new Date().getFullYear()}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg"
@@ -178,8 +223,8 @@ export default function AddNewBookPage(){
                   <input
                     type="text"
                     name="isbn"
-                    value="isbn" 
-
+                    value={formData.isbn} 
+                    onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                     placeholder="978-0-123456-78-9"
                   />
@@ -192,8 +237,8 @@ export default function AddNewBookPage(){
                   <input
                     type="text"
                     name="tags"
-                    value="tags" 
-
+                    value={formData.tags} 
+                    onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                     placeholder="business, finance"
                   />
@@ -213,7 +258,8 @@ export default function AddNewBookPage(){
                   type="checkbox"
                   id="isFeatured"
                   name="isFeatured"  
-
+                  checked={formData.isFeatured}
+                  onChange={handleChange}
                   className="w-4 h-4 text-indigo-600"
                 />
                 <label htmlFor="isFeatured" className="text-sm font-medium text-gray-700">
@@ -226,7 +272,8 @@ export default function AddNewBookPage(){
                   type="checkbox"
                   id="isPublished"
                   name="isPublished" 
-
+                  checked={formData.isPublished}
+                  onChange={handleChange}
                   className="w-4 h-4 text-indigo-600"
                 />
                 <label htmlFor="isPublished" className="text-sm font-medium text-gray-700">
@@ -246,18 +293,18 @@ export default function AddNewBookPage(){
           <div className="flex items-center justify-end space-x-4">
             <button
               type="button" 
-
+              onClick={() => router.back() }
               className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
-               
+              disabled={loading} 
             >
               Cancel
             </button>
             <button
               type="submit"
               className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg disabled:opacity-50"
-              
+              disabled={loading} 
             >
-              Create Book
+             {loading ? "Creating..." : "Create Book"} 
             </button>
           </div>
         </form>
