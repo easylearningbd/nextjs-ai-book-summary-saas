@@ -88,6 +88,65 @@ export default function AddNewBookPage(){
     };
 
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setErrors({});
+
+    try {
+        
+    /// Upload Files first 
+    let coverImageUrl = "";
+    let pdfUrl = "";
+
+    if (coverImageFile) {
+        const formData = new FormData();
+        formData.append("file", coverImageFile);
+        formData.append("type", "cover");
+
+        const uploadResponse = await fetch("/api/admin/upload", {
+            method: "POST",
+            body: formData,
+        });
+
+        if (uploadResponse.ok) {
+            const data = await uploadResponse.json();
+            coverImageUrl = data.url;
+        } 
+    }
+
+
+      if (pdfFile) {
+        const formData = new FormData();
+        formData.append("file", pdfFile);
+        formData.append("type", "pdf");
+
+        const uploadResponse = await fetch("/api/admin/upload", {
+            method: "POST",
+            body: formData,
+        });
+
+        if (uploadResponse.ok) {
+            const data = await uploadResponse.json();
+            pdfUrl = data.url;
+        } 
+    }
+
+
+    // Create book 
+    
+
+
+
+    } catch (error) {
+        
+    }
+
+
+
+    }
+
+
     return (
         <div className="max-w-5xl mx-auto">
       <div className="mb-8">
@@ -98,7 +157,7 @@ export default function AddNewBookPage(){
       </div>
 
       <div>
-        <form  className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           
        {errors.general && ( 
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
