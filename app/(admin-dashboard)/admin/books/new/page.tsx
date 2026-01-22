@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -67,6 +67,25 @@ export default function AddNewBookPage(){
                 setErrors((prev) => ({ ...prev, [name]: ""}));
             }
         } 
+
+    const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setCoverImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setCoverImagePreview(reader.result as string);
+            }
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handlePdfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setPdfFile(file);
+        }
+    };
 
 
     return (
@@ -169,16 +188,16 @@ export default function AddNewBookPage(){
                   <input
                     type="file"
                     accept="image/*" 
-
+                    onChange={handleCoverImageChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                   />
-                
+                {coverImagePreview && ( 
                     <img
-                      src=" "
+                      src={coverImagePreview}
                       alt="Cover preview"
                       className="mt-2 w-32 h-48 object-cover rounded-lg border"
                     />
-                  
+                  )}
                 </div>
 
                 <div>
@@ -188,13 +207,14 @@ export default function AddNewBookPage(){
                   <input
                     type="file"
                     accept=".pdf" 
-
+                    onChange={handlePdfChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                   />
-                 
+                 {pdfFile && ( 
                     <p className="text-sm text-green-600 mt-2">
-                      ✓ name
+                      ✓ {pdfFile.name}
                     </p>
+                   )}
                   
                 </div>
               </div>
