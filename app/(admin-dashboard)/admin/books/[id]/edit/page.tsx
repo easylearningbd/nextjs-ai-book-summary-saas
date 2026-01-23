@@ -107,6 +107,44 @@ export default function EditBookPage(){
             }
         } 
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setErrors({});
+
+        try {
+            const response = await fetch(`/api/admin/books/${bookId}`,{
+                method: "PUT",
+                headers:{
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    categoryId: parseInt(formData.categoryId),
+                    publicationYear: formData.publicationYear ? parseInt(formData.publicationYear) : null,
+
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (data.errors) {
+                    setErrors(data.errors);
+                } else {
+                    setErrors({general: data.error || "Filed to update book" });
+                }
+                setLoading(false);
+                return;
+            }
+            toast.success("Book updated successfully");
+            router.push("/admin/books");
+
+        } catch (error) {
+            setErrors({ general: "An error occurred while updating the book"  })
+        }
+    };
+
       
 
     return (
@@ -119,7 +157,7 @@ export default function EditBookPage(){
       </div>
 
       <div>
-        <form className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           
        {errors.general && ( 
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
