@@ -53,7 +53,43 @@ export default function EditBookPage(){
 
     const [errors, setErrors] = useState<Record<string,string>>({});
 
-    /// Fetch categories 
+    /// Fetch Book and Categories 
+    useEffect(() => {
+        async function fetchData(){
+            try {
+                // Fetch book 
+
+        const bookResponse = await fetch(`/api/admin/books/${bookId}`);
+        if (bookResponse.ok) {
+            const bookData = await bookResponse.json();
+            setBook(bookData);
+            setFormData({
+                title: bookData.title,
+                author: bookData.author,
+                categoryId: bookData.categoryId.toString(),
+                description: bookData.description,
+                publicationYear: bookData.publicationYear?.toString() || "",
+                isbn: bookData.isbn || "",
+                isFeatured: bookData.isFeatured,
+                isPublished: bookData.isPublished,
+            });
+        }
+
+        // Fetch Categoeies 
+        const cotegoriesResponse = await fetch("/api/admin/categoies");
+        if (cotegoriesResponse.ok) {
+            const categoriesData = await cotegoriesResponse.json();
+            setCategories(categoriesData);
+        }
+        setLoading(false);
+            } catch (error) {
+        console.error("Failed to fetch data:",error);
+            }
+        }
+        fetchData()
+
+    },[bookId]);
+
     
      const handleChange = (
             e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement >
