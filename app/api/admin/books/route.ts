@@ -55,10 +55,28 @@ const session = await auth();
         .replace(/(^-|-$)/g, "");
 
     /// Create book in book table 
-    
+    const book = await prisma.book.create({
+        data: {
+            title: data.title,
+            slug: slug,
+            author: data.author,
+            categoryId: data.categoryId,
+            description: data.description,
+            publicationYear: data.publicationYear,
+            isbn: data.isbn, 
+            coverImageUrl: data.coverImageUrl,
+            originalPdfUrl: data.pdfUrl,
+            isFeatured: data.isFeatured,
+            isPublished: data.isPublished,
+            summaryGenerated: false,
+            audioGenerated: false,
+            createdById: session.user.id,
+        },
 
+    });
 
+    return NextResponse.json(book,{status:201});
     } catch (error) {
-        
+        console.error("Error Creating book", error);
     }
 }
