@@ -76,7 +76,7 @@ export default function EditBookPage(){
         }
 
         // Fetch Categoeies 
-        const cotegoriesResponse = await fetch("/api/admin/categoies");
+        const cotegoriesResponse = await fetch("/api/admin/categories");
         if (cotegoriesResponse.ok) {
             const categoriesData = await cotegoriesResponse.json();
             setCategories(categoriesData);
@@ -232,10 +232,20 @@ export default function EditBookPage(){
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                     placeholder="978-0-123456-78-9"
                   />
-                </div>
-
-                 
+                </div>  
               </div>
+
+            {book?.coverImageUrl && (
+                <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+            Current Cover Image 
+            </label>
+            <img src={book.coverImageUrl} alt={book.title} 
+            className="w-32 h-48 object-cover rounded-lg border"
+            /> 
+                </div>
+            )} 
+
             </div>
           </div>
 
