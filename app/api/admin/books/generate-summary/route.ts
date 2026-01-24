@@ -140,6 +140,64 @@ Please provide:
 
     // Generate details in 150 word summary for each chapter 
 
+    const chaptersWithSummaries = [];
+    for (let i = 0; i < tableOfContents.length; i++) {
+        const chapter = tableOfContents[i];
+        sendMessage(`Generating professional summary for Chapter ${chapter.chapterNumber}: ${chapter.titie}...`);
+
+        try {
+            const chapterSummaryCompletion = await openai.chat.completions.create({
+                model: "gpt-4",
+                messages: [
+            {
+        role: "system",
+        content: "You are a professional book summarizer. Create detailed, engaging, and professional chapter summaries that capture the key insights and actionable takeaways.",
+        },
+        {
+        role: "user",
+        content: `Based on the following book content, create a detailed 150-word professional summary for this specific chapter:
+
+Book: "${book.title}" by ${book.author}
+Chapter ${chapter.chapterNumber}: ${chapter.title}
+
+Book Content:
+${pdfText}
+
+Create a comprehensive, professional summary of exactly 150 words that:
+1. Captures the main ideas and key concepts of this chapter
+2. Highlights actionable insights and takeaways
+3. Uses engaging, professional language
+4. Provides value to readers looking to understand this chapter's core message
+
+Return ONLY the 150-word summary text, nothing else.`,
+                  },
+                ],
+                 temperature: 0.7,
+                 max_tokens: 300,
+            });
+
+    const detailedSummary = chapterSummaryCompletion.choices[0].message.content || chapter.description;
+    chaptersWithSummaries.push({
+        ...chapter,
+        detailedSummary: detailedSummary,
+    });
+
+    sendMessage(`Chapter ${chapter.chapterNumber} summary completed`);
+        } catch (error) {
+            console.error(`Error generating summary for chapter ${chapter.chapterNumber}:`, error);
+            chaptersWithSummaries.push({
+                ...chapter,
+               detailedSummary: chapter.description,
+            });
+            sendMessage(`Warning: using brief description for chapter ${chapter.chapterNumber}`);
+        }        
+    }
+
+    sendMessage("Saving summary to database...");
+
+    // save to database 
+    
+
         
     } catch (error) {
         
