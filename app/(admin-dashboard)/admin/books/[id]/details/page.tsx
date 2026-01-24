@@ -1,0 +1,253 @@
+"use client"
+
+import { useState, useEffect } from "react";
+import { useRouter,useParams } from "next/navigation";
+import Link from "next/link";
+
+interface Chapter { 
+    id: number;
+    chapterNumber: number;
+    chapterTitle: string;
+    chapterSummary: string;
+    audioUrl: string | null;
+    audioDuration: number;
+}
+
+interface Summary { 
+    mainSummary: string;
+    tableOfContents: any;  
+}
+
+interface Book {
+    id: number;
+    title: string; 
+    author: string; 
+    description: string;
+    publicationYear: number | null;
+    isbn: string | null;
+    coverImageUrl: string | null;
+    isFeatured: boolean;
+    isPublished: boolean;
+    summaryGenerated: boolean;
+    audioGenerated: boolean;
+    category: {
+       name: string; 
+    }
+    summary: Summary | null;
+    chapters: Chapter[];
+
+}
+
+
+export default function BookDetailsPage(){
+
+    return (
+         <div className="max-w-6xl mx-auto">
+      {/* Header */}
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">title</h1>
+          <p className="text-gray-600 mt-2">by author</p>
+        </div>
+        <div className="flex space-x-3">
+          <Link
+            href={`/admin/books/id/edit`}
+            className="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700"
+          >
+            ✏️ Edit Book
+          </Link>
+          <button
+            
+            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
+          >
+            ← Back to Books
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-6">
+        {/* Left Column - Book Info */}
+        <div className="col-span-1 space-y-6">
+          {/* Cover Image */}
+         
+            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+              <img
+                 
+                className="w-full rounded-lg shadow-lg"
+              />
+            </div>
+          
+
+          {/* Book Details */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Book Details</h2>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-gray-600">Category</p>
+                <p className="font-semibold text-gray-900">category</p>
+              </div>
+            
+                <div>
+                  <p className="text-sm text-gray-600">Publication Year</p>
+                  <p className="font-semibold text-gray-900">publicationYear</p>
+                </div>
+              
+               
+                <div>
+                  <p className="text-sm text-gray-600">ISBN</p>
+                  <p className="font-semibold text-gray-900">isbn</p>
+                </div>
+              
+              <div>
+                <p className="text-sm text-gray-600">Status</p>
+                <span
+                  className={`inline-block px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-700`}
+                >
+                 Published
+                </span>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Featured</p>
+                <span
+                  className={`inline-block px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-700`}
+                >
+                 Yes
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Generation Status */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">AI Generation Status</h2>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Summary</span>
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700`}
+                >
+                 ✓ Generated  ✗ Not Generated 
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Audio</span>
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700`}
+                >
+                 ✓ Generated ✗ Not Generated  
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Summary & Chapters */}
+        <div className="col-span-2 space-y-6">
+          {/* Description */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Description</h2>
+            <p className="text-gray-700 leading-relaxed">description</p>
+          </div>
+
+          {/* AI Summary */}
+           
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-200 p-6 shadow-sm">
+              <div className="flex items-center space-x-2 mb-4">
+                <span className="text-2xl">🤖</span>
+                <h2 className="text-xl font-bold text-gray-900">AI-Generated Summary</h2>
+              </div>
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  mainSummary
+                </p>
+              </div>
+            </div>
+          
+
+          {/* Chapters with Audio */}
+          
+            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+              <div className="flex items-center space-x-2 mb-6">
+                <span className="text-2xl">📚</span>
+                <h2 className="text-xl font-bold text-gray-900">Chapters</h2>
+              </div>
+              <div className="space-y-4">
+                
+                  <div
+                    
+                    className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h3 className="font-bold text-gray-900 text-lg">
+                          Chapter chapterNumber
+                        </h3>
+                       
+                          <p className="text-sm text-gray-500 mt-1">
+                            Duration:   sec
+                          </p>
+                     
+                      </div>
+                     
+                        <button
+                           
+                          className={`px-4 py-2 rounded-lg font-semibold transition-colors bg-red-600 text-white hover:bg-red-700`}
+                        >
+                          ⏸ Pause ▶ Play Audio  
+                        </button>
+                    
+                    </div>
+
+                    <p className="text-gray-700 leading-relaxed mb-4">
+                     chapterSummary
+                    </p>
+
+                    {/* Audio Player */}
+                    
+                      <div className="mt-4 bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <audio
+                          controls
+                          autoPlay
+                          className="w-full" 
+                        >
+                          Your browser does not support the audio element.
+                        </audio>
+                      </div>
+                    
+
+                   
+                      <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                        <p className="text-sm text-yellow-800">
+                          ⚠️ Audio not generated for this chapter
+                        </p>
+                      </div>
+                    
+                  </div>
+                
+              </div>
+            </div>
+           
+
+          {/* No Summary Message */}
+          
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-8 text-center">
+              <div className="text-6xl mb-4">📝</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                No Summary Generated Yet
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Generate an AI summary to see the book summary and chapters here
+              </p>
+              <Link
+                href={`/admin/books/id/edit`}
+                className="inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700"
+              >
+                Go to Edit Page to Generate Summary
+              </Link>
+            </div>
+          
+        </div>
+      </div>
+    </div>
+    );
+}
