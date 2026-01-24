@@ -36,9 +36,9 @@ export async function POST(request: NextRequest) {
     /// Create reaable stream for Server-send events.
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
-        async start(conroller) {
+        async start(controller) {
             const sendMessage = (message: string) => {
-                conroller.enqueue(encoder.encode(`data: ${JSON.stringify({ message })}\n\n`));
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ message })}\n\n`));
             };
 
     try {
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
         sendMessage("Starting summary generation...");
         // extract text from pdf
         let pdfText = "";
-        if (book.originalPdfPath) {
+        if (book.originalPdfUrl) {
             sendMessage("Extracting text from PDF...");
             try {
                 const pdfParse = require("pdf-parse");
@@ -196,25 +196,51 @@ Return ONLY the 150-word summary text, nothing else.`,
     sendMessage("Saving summary to database...");
 
     // save to database 
-    
+    await prisma.bookSummary.create({
+        data: {
+            bookId: book.id,
+            mainSummary: summaryText,
+            tableOfContents: tableOfContents,
+        }
+    });
 
-        
-    } catch (error) {
-        
+    // Create chapters with detials in book chapter table 
+    for(const chapter of chaptersWithSummaries){
+        await prisma.bookChapter.create({
+            data: {
+                bookId: book.id,
+                chapterNumber: chapter.chapterNumber,
+                chapterTitle: chapter.title,
+                chapterSummary: chapter.detailedSummary,
+                audioUrl: null,
+                audioDuration: 0,
+            }            
+        });
     }
 
-
-
-
-
-        }
-    })
-    
-
-
-
-        
+    /// Update book Status 
+    await prisma.book.update({
+        where: {id: book.id},
+        data: { summaryGenerated: true },
+    });
+    sendMessage("Summary generation completed");
+    controller.enqueue(encoder.encode(`data: ${JSON.stringify({ message: "Completed", completed: true})}\n\n`));
+    controller.close();          
     } catch (error) {
-        
+        console.error("Error generating summary", error);
+    } 
+
+        },
+    });
+
+    return new Response(stream,{
+        headers:{
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            Connection: "keep-alive",
+        },
+    });   
+    } catch (error) {
+        console.error("Error generating summary", error);
     }
 }
