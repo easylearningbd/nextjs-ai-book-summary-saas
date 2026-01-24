@@ -55,6 +55,7 @@ export default function BookDetailsPage(){
                 const response = await fetch(`/api/admin/books/${bookId}/details`);
                 if (response.ok) {
                     const data = await response.json();
+                    //console.log("book data:", data); 
                     setBook(data);
                 }
                 setLoading(false);
