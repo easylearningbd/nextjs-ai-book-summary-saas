@@ -145,7 +145,20 @@ export default function EditBookPage(){
         }
     };
 
+    /// Function for generate book summary by chatgpt api
+    const handleGenerateSummary = async () => {
+
+    } 
+
+
       
+    if (!book) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-xl">Book not found</div>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-5xl mx-auto">
@@ -351,29 +364,38 @@ export default function EditBookPage(){
 
         {/* AI Summary Generation */}
         
-          <div className="mt-6 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
-              🤖 AI Summary Generation
-            </h2>
-            <div className="space-y-4">
-              <p className="text-gray-600">
-                Generate AI-powered summary using ChatGPT
+    <div className="mt-6 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+    <h2 className="text-xl font-bold text-gray-900 mb-4">
+        🤖 AI Summary Generation
+    </h2>
+    <div className="space-y-4">
+        <div className="flex items-center justify-between">
+            <div>
+                <p className="text-gray-600">
+            {book.summaryGenerated 
+                ? "Summary Already Generated"
+                : "Generate AI-Powered summary from PDF"
+            } 
               </p>
-
-              
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-800">summaryProgress</p>
-                </div>
-              
-
-              <button
-               
-                className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold hover:shadow-lg disabled:opacity-50"
-              >
-               Generate Summary with ChatGPT
-              </button>
             </div>
-          </div>
+
+             <button
+                onClick={handleGenerateSummary}
+                disabled={generatingSummary}
+        className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold hover:shadow-lg disabled:opacity-50"
+        >
+         {generatingSummary ? "Generating..." : book.summaryGenerated ? "Regenerating Summary" : "Generate Summary"}  
+        </button> 
+        </div>
+
+        {summaryProgress && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">{summaryProgress}</p>
+            </div>
+        )} 
+       
+    </div>
+    </div>
         
 
         {/* Audio Generation */}
