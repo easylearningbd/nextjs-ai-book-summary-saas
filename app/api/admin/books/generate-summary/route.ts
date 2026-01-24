@@ -71,7 +71,75 @@ export async function POST(request: NextRequest) {
         sendMessage("Sending to CHAT GPT API...");
 
         // GENERATE MAIN SUMMARY FOR THE BOOK 
-        
+    const summaryCompletion = await openai.chat.completions.create({
+        model: "gpt-4", 
+        messages: [
+            {
+                role: "system",
+                content: "You are a professional book summarizer. Create concise, engaging summaries that capture the key insights and main ideas of books.",
+              },
+              {
+                role: "user",
+                content: `Create a comprehensive summary for the following book:
+
+Title: ${book.title}
+Author: ${book.author}
+
+Book Content:
+${pdfText}
+
+Please provide:
+1. A main summary (150-200 words) that captures the essence of the book
+2. 5-7 key takeaways (bullet points)
+3. Target audience
+4. Main themes`,
+              },
+            
+            ],
+            temperature: 0.7,
+            max_tokens: 1000,
+    });
+
+    const summaryText = summaryCompletion.choices[0].message.content || "";
+    sendMessage("Generating table of contents...");
+
+    // Generate table of contents 
+
+    const tocCompletion = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages:[
+            {
+                role: "system",
+                content: "You are creating a table of contents for a book summary. Return ONLY a JSON array.",
+              },
+              {
+                role: "user",
+                content: `Create a table of contents (chapter list) for "${book.title}" by ${book.author}.
+                Return ONLY a JSON array of objects with this structure: [{"chapterNumber": 1, "title": "Chapter Title", "description": "Brief description"}]
+                Create 8-12 logical chapters.`,
+              },  
+        ],
+        temperature: 0.7,
+        max_tokens: 800,
+    });
+
+    let tableOfContents = [];
+    try {
+        const tocText = tocCompletion.choices[0].message.content || "[]";
+        tableOfContents = JSON.parse(tocText);
+    } catch (e) {
+        console.error("Failed to parse toc", e);
+        tableOfContents = [
+            { chapterNumber: 1, title: "Introduction", description: "Overview of the book" },
+            { chapterNumber: 2, title: "Main Content", description: "Key concepts and ideas" },
+            { chapterNumber: 3, title: "Conclusion", description: "Final thoughts and takeaways" },
+        ];
+    }
+
+    sendMessage("Generating details chapter summaries...");
+
+    // Generate details in 150 word summary for each chapter 
+
         
     } catch (error) {
         
