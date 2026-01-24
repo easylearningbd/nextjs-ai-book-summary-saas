@@ -145,10 +145,53 @@ export default function EditBookPage(){
         }
     };
 
-    /// Function for generate book summary by chatgpt api
-    const handleGenerateSummary = async () => {
+/// Function for generate book summary by chatgpt api
+const handleGenerateSummary = async () => {
+    setGeneratingSummary(true);
+    setSummaryProgress("Extracting text from PDF...");
 
-    } 
+    try {
+        const response = await fetch("/api/admin/books/generate-summary", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ bookId: parseInt(bookId) }),
+        });
+
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+
+        if (reader) {
+            while(true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split("\n");
+
+            for (const line of lines) {
+                    if (line.startsWith("data:")) {
+                    const data = JSON.parse(line.slice(6));
+                    setSummaryProgress(data.message);
+
+                    if (data.completed) {
+                        setGeneratingSummary(false);
+                        toast.success("Summary generated successfully");
+                        // Refreah book data
+                        window.location.reload();
+                        break;
+                    }
+                    }                    
+                }
+            }
+        }            
+    } catch (error) {
+            setGeneratingSummary(false);
+            setSummaryProgress("");
+            toast.error("Failed to generate summary");
+    }
+};
 
 
       
