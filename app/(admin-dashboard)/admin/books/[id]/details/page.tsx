@@ -41,6 +41,50 @@ interface Book {
 
 export default function BookDetailsPage(){
 
+    const router = useRouter();
+    const params = useParams();
+    const bookId = params.id as string;
+
+    const [loading, setLoading] = useState(true);
+    const [book, setBook] = useState<Book | null>(null);
+    const [currentAudio, setCurrentAudio] = useState<number | null>(null);
+
+    useEffect(() => {
+        async function fetchBook() {
+            try {
+                const response = await fetch(`/api/admin/books/${bookId}/details`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setBook(data);
+                }
+                setLoading(false);
+            } catch (error) {
+                console.error("Failed to fetch book details", error);
+                setLoading(false);
+            }
+        }
+        fetchBook()
+    },[bookId]);
+
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+            <div className="text-xl">Loading...</div>
+            </div>
+        );
+    }
+
+
+    if (!book) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+            <div className="text-xl">Book not found</div>
+            </div>
+        );
+    }
+ 
+
     return (
          <div className="max-w-6xl mx-auto">
       {/* Header */}
