@@ -194,6 +194,13 @@ const handleGenerateSummary = async () => {
 };
 
 
+
+/// Function for generate book summary Audio by chatgpt api
+const handleGenerateAudio = async () => {
+
+}
+
+
       
     if (!book) {
         return (
@@ -448,22 +455,35 @@ const handleGenerateSummary = async () => {
               🎧 Audio Generation
             </h2>
             <div className="space-y-4">
-              <p className="text-gray-600">
-                Generate audio using Text-to-Speech
-              </p>
-
-              
-                <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                  <p className="text-sm text-purple-800">audioProgress</p>
-                </div>
-               
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600">
+                  {book.audioGenerated 
+                    ? "Audio Alrady generated"
+                    : book.summaryGenerated
+                    ? "Generate audio from summary"
+                    : " Please generate summary first"
+                  }
+                
+              </p> 
+              </div>
 
               <button
-              
+                onClick={handleGenerateAudio}
+                disabled={generatingAudio || !book.summaryGenerated}
                 className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg disabled:opacity-50"
               >
-                🎧 Generate Audio
-              </button>
+                {generatingAudio ? "Generating..." : book.audioGenerated ? "Regenerate Audio" : "🎧 Generate Audio"}  
+              </button> 
+            </div> 
+
+          {audioProgress && (
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <p className="text-sm text-purple-800">{audioProgress}</p>
+            </div>
+          )}
+
+              
             </div>
           </div>
          
