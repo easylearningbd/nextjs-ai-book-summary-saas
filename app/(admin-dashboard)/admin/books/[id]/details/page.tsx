@@ -208,11 +208,11 @@ export default function BookDetailsPage(){
           {/* Description */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Description</h2>
-            <p className="text-gray-700 leading-relaxed">description</p>
+            <p className="text-gray-700 leading-relaxed">{book.description}</p>
           </div>
 
           {/* AI Summary */}
-           
+           {book.summary && ( 
             <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-200 p-6 shadow-sm">
               <div className="flex items-center space-x-2 mb-4">
                 <span className="text-2xl">🤖</span>
@@ -220,78 +220,84 @@ export default function BookDetailsPage(){
               </div>
               <div className="bg-white rounded-lg p-6 shadow-sm">
                 <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                  mainSummary
+                  {book.summary.mainSummary}
                 </p>
               </div>
             </div>
-          
+          )}
 
           {/* Chapters with Audio */}
-          
-            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-              <div className="flex items-center space-x-2 mb-6">
-                <span className="text-2xl">📚</span>
-                <h2 className="text-xl font-bold text-gray-900">Chapters</h2>
-              </div>
-              <div className="space-y-4">
-                
-                  <div
-                    
-                    className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h3 className="font-bold text-gray-900 text-lg">
-                          Chapter chapterNumber
-                        </h3>
-                       
-                          <p className="text-sm text-gray-500 mt-1">
-                            Duration:   sec
-                          </p>
-                     
-                      </div>
-                     
-                        <button
-                           
-                          className={`px-4 py-2 rounded-lg font-semibold transition-colors bg-red-600 text-white hover:bg-red-700`}
-                        >
-                          ⏸ Pause ▶ Play Audio  
-                        </button>
-                    
-                    </div>
-
-                    <p className="text-gray-700 leading-relaxed mb-4">
-                     chapterSummary
+    {book.chapters && book.chapters.length > 0 && (       
+    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+        <div className="flex items-center space-x-2 mb-6">
+        <span className="text-2xl">📚</span>
+        <h2 className="text-xl font-bold text-gray-900">Chapters</h2>
+        </div>
+        <div className="space-y-4">
+        {book.chapters.map((chapter) => ( 
+            <div
+            key={chapter.id}
+            className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow"
+            >
+            <div className="flex items-start justify-between mb-3">
+                <div>
+                <h3 className="font-bold text-gray-900 text-lg">
+                    Chapter {chapter.chapterNumber} : {chapter.chapterTitle}
+                </h3>
+                {chapter.audioDuration > 0 && ( 
+                    <p className="text-sm text-gray-500 mt-1">
+                    Duration: {Math.floor(chapter.audioDuration / 60)} min {chapter.audioDuration % 60} sec
                     </p>
-
-                    {/* Audio Player */}
-                    
-                      <div className="mt-4 bg-purple-50 border border-purple-200 rounded-lg p-4">
-                        <audio
-                          controls
-                          autoPlay
-                          className="w-full" 
-                        >
-                          Your browser does not support the audio element.
-                        </audio>
-                      </div>
-                    
-
-                   
-                      <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                        <p className="text-sm text-yellow-800">
-                          ⚠️ Audio not generated for this chapter
-                        </p>
-                      </div>
-                    
-                  </div>
-                
-              </div>
+                )}
+                </div>
+                {chapter.audioUrl && ( 
+                <button
+                    onClick={() => setCurrentAudio(currentAudio === chapter.id ? null : chapter.id)}
+                    className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                        currentAudio === chapter.id 
+                        ? "bg-red-600 text-white hover:bg-red-700"
+                        : "bg-purple-600 text-white hover:bg-purple-700"
+                    } `}
+                >
+                   {currentAudio === chapter.id ? "⏸ Pause" : "▶ Play Audio"}    
+                </button>
+                 )}
             </div>
-           
+
+            <p className="text-gray-700 leading-relaxed mb-4">
+                {chapter.chapterSummary}
+            </p>
+
+            {/* Audio Player */}
+            {chapter.audioUrl && currentAudio === chapter.id && (
+                <div className="mt-4 bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <audio
+                    controls
+                    autoPlay
+                    className="w-full" 
+                    src={chapter.audioUrl}
+                    onEnded={() => setCurrentAudio(null)}
+                >
+                    Your browser does not support the audio element.
+                </audio>
+                </div>
+             )}
+
+            {!chapter.audioUrl && (
+                <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <p className="text-sm text-yellow-800">
+                    ⚠️ Audio not generated for this chapter
+                </p>
+                </div>
+             )}
+            </div>
+        ))}
+        </div>
+    </div>
+        )}
 
           {/* No Summary Message */}
-          
+          {!book.summary && ( 
             <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-8 text-center">
               <div className="text-6xl mb-4">📝</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
@@ -301,13 +307,13 @@ export default function BookDetailsPage(){
                 Generate an AI summary to see the book summary and chapters here
               </p>
               <Link
-                href={`/admin/books/id/edit`}
+                href={`/admin/books/${bookId}/edit`}
                 className="inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700"
               >
                 Go to Edit Page to Generate Summary
               </Link>
             </div>
-          
+          )}
         </div>
       </div>
     </div>
