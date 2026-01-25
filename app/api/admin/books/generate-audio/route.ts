@@ -101,32 +101,31 @@ export async function POST(request: NextRequest){
         }
 
         // Update book with audio status 
-
-
-
-
+    await prisma.book.update({
+        where: {id: book.id},
+        data: {
+            audioGenerated: true,
+            totalAudioDuration: totalDuration,
+        },
+    });
+    sendMessage("Audio generation completed");
+    controller.enqueue(encoder.encode(`data: ${JSON.stringify({ message: "Compalted", completed: true})}\n\n`));
+    controller.close();
     } catch (error) {
-        
-    }
+        console.error("Error Generating audio", error);
+       }
+      },
+    });
 
-
-
-
-
-
-
-        }
-    })
-
-
-
-
-
+    return new Response(stream, {
+         headers:{
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            Connection: "keep-alive",
+        },
+    });
     } catch (error) {
-        
-    }
-
-
-
+        console.error("Error Generating audio", error);
+    } 
 
 }
