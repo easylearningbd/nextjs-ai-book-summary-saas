@@ -65,7 +65,44 @@ export async function POST(request: NextRequest){
 
         // generate audio for each chapter 
 
-        
+        for (let i = 0; i < book.chapters.length; i++) {
+            const chapter = book.chapters[i];
+            sendMessage(`Generating audio for Chapter ${chapter.chapterNumber}: ${chapter.chapterTitle}...`);
+
+            // Generate sppech using Openai tts
+        const mp3Response = await openai.audio.speech.create({
+            model: "tts-1",
+            voice: "alloy",
+            input: `Chapter ${chapter.chapterNumber}: ${chapter.chapterTitle}. ${chapter.chapterSummary}`,
+        });
+
+        // Save audio file 
+        const audioFilename = `${book.id}-chapter-${chapter.chapterNumber}-${Date.now()}.mp3`;
+        const audioPath = join(uploadDir, audioFilename);
+        const audioBuffer = Buffer.from(await mp3Response.arrayBuffer());
+        await writeFile(audioPath, audioBuffer);
+
+        const audioUrl = `/uploads/audio/${audioFilename}`;
+
+        // Estimate duration (150 Words per minute, average 5 characters per word)
+        const estimatedDuration = Math.ceil((chapter.chapterSummary.length / 5 ) / 150 * 60);
+        totalDuration += estimatedDuration;
+
+        // Update chapter with audio url 
+        await prisma.bookChapter.update({
+            where: {id: chapter.id},
+            data: {
+                audioUrl: audioUrl,
+                audioDuration: estimatedDuration, 
+            },
+        });
+        sendMessage(`Chapter ${chapter.chapterNumber} audio generated successfully`);
+            
+        }
+
+        // Update book with audio status 
+
+
 
 
     } catch (error) {
