@@ -195,10 +195,54 @@ const handleGenerateSummary = async () => {
 
 
 
-/// Function for generate book summary Audio by chatgpt api
-const handleGenerateAudio = async () => {
+/// Function for generate book summary Audio by chatgpt api 
 
-}
+const handleGenerateAudio = async () => {
+    setGeneratingAudio(true);
+    setAudioProgress("Generating audio from summary...");
+
+    try {
+        const response = await fetch("/api/admin/books/generate-audio", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ bookId: parseInt(bookId) }),
+        });
+
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+
+        if (reader) {
+            while(true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split("\n");
+
+            for (const line of lines) {
+                    if (line.startsWith("data:")) {
+                    const data = JSON.parse(line.slice(6));
+                    setAudioProgress(data.message);
+
+                    if (data.completed) {
+                        setGeneratingAudio(false);
+                        toast.success("Audio generated successfully");
+                        // Refreah book data
+                        window.location.reload();
+                        break;
+                    }
+                    }                    
+                }
+            }
+        }            
+    } catch (error) {
+            setGeneratingAudio(false);
+            setAudioProgress("");
+            toast.error("Failed to generate Audio");
+    }
+};
 
 
       
