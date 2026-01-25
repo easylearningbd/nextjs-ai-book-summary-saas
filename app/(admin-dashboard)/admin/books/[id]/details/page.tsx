@@ -91,18 +91,18 @@ export default function BookDetailsPage(){
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">title</h1>
-          <p className="text-gray-600 mt-2">by author</p>
+          <h1 className="text-3xl font-bold text-gray-900">{book.title}</h1>
+          <p className="text-gray-600 mt-2">by {book.author}</p>
         </div>
         <div className="flex space-x-3">
           <Link
-            href={`/admin/books/id/edit`}
+            href={`/admin/books/${bookId}/edit`}
             className="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700"
           >
             ✏️ Edit Book
           </Link>
           <button
-            
+            onClick={ () => router.push("/admin/books") }
             className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
           >
             ← Back to Books
@@ -114,14 +114,15 @@ export default function BookDetailsPage(){
         {/* Left Column - Book Info */}
         <div className="col-span-1 space-y-6">
           {/* Cover Image */}
-         
+         {book.coverImageUrl && ( 
             <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
               <img
-                 
+                src={book.coverImageUrl}
+                alt={book.title}
                 className="w-full rounded-lg shadow-lg"
               />
             </div>
-          
+          )}
 
           {/* Book Details */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
@@ -129,34 +130,42 @@ export default function BookDetailsPage(){
             <div className="space-y-3">
               <div>
                 <p className="text-sm text-gray-600">Category</p>
-                <p className="font-semibold text-gray-900">category</p>
+                <p className="font-semibold text-gray-900">{book.category.name}</p>
               </div>
-            
+            {book.publicationYear && (
                 <div>
                   <p className="text-sm text-gray-600">Publication Year</p>
-                  <p className="font-semibold text-gray-900">publicationYear</p>
+                  <p className="font-semibold text-gray-900">{book.publicationYear}</p>
                 </div>
-              
-               
+               )}
+                {book.isbn && (
                 <div>
                   <p className="text-sm text-gray-600">ISBN</p>
-                  <p className="font-semibold text-gray-900">isbn</p>
+                  <p className="font-semibold text-gray-900">{book.isbn}</p>
                 </div>
-              
+               )}
               <div>
                 <p className="text-sm text-gray-600">Status</p>
                 <span
-                  className={`inline-block px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-700`}
+                  className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
+                    book.isPublished 
+                    ? "bg-green-100 text-green-700"
+                    : "bg-yellow-100 text-yellow-700"
+                  }`}
                 >
-                 Published
+                {book.isPublished ? "Published" : "Draft"} 
                 </span>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Featured</p>
                 <span
-                  className={`inline-block px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 text-purple-700`}
+                  className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
+                    book.isFeatured
+                    ? "bg-purple-100 text-purple-700"
+                    : "bg-gray-100 text-gray-700"                
+                  } `}
                 >
-                 Yes
+                {book.isFeatured ? "Yes" : "No"}  
                 </span>
               </div>
             </div>
@@ -169,17 +178,25 @@ export default function BookDetailsPage(){
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Summary</span>
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700`}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    book.summaryGenerated
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                  } `}
                 >
-                 ✓ Generated  ✗ Not Generated 
+                {book.summaryGenerated ? "✓ Generated" : "✗ Not Generated"}    
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Audio</span>
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700`}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    book.audioGenerated
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                  } `}
                 >
-                 ✓ Generated ✗ Not Generated  
+                {book.audioGenerated ? "✓ Generated" : "✗ Not Generated"}    
                 </span>
               </div>
             </div>
