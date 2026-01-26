@@ -36,11 +36,48 @@ interface Category {
 
 export default function BooksPage(){
 
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const [books, setBooks] =  useState<Book[]>([]);
+    const [categories, setCategories] =  useState<Category[]>([]);
+    const [loading, setLoading] = useState(true)
+    const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+    const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "");
+    const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"));
+    const [totalPages, setTotalPages] = useState(1);
+    const [user, setUser] = useState<any>(null);
+
+
+    async function fetchUser(){
+        try {
+            const response = await fetch("/api/user/profile");
+            if (response.ok) {
+                const data = await response.json();
+                setUser(data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch user", error);
+        }
+    }
+
+    async function fetchCategories(){
+        try {
+            const response = await fetch("/api/user/categories");
+            if (response.ok) {
+                const data = await response.json();
+                setCategories(data);
+            }
+            
+        } catch (error) {
+            console.error("Failed to fetch Categories", error);
+        }
+    }
 
 
 
 
-    
+
+
     return (
         <div className="min-h-screen bg-gray-50">
 {/* Navigation Header */}
