@@ -29,7 +29,55 @@ export async function GET(request: NextRequest) {
         }
 
     // Fetch books data with pagination 
-    
+    const [books, totalCount] = await Promise.all([
+        prisma.book.findMany({
+            where,
+            include: {
+                category: {
+                    select: {
+                        id: true,
+                        name: true,
+                        slug: true,
+                        icon: true,
+                    },
+                },
+               _count: {
+                select: {
+                    reviews: true,
+                    favorites: true,
+                },
+               },
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+            skip,
+            take: limit,
+        }),
+        prisma.book.count({ where }),
+    ]);
+
+    // Calaculate avarage ratings 
+    const booksWithRatings = await Promise.all(
+        books.map(async(book) => {
+            const avgRating = await prisma.bookReview.aggregate({
+                where: {
+                    bookId: book.id,
+                    isApproved: true,
+                },
+                _avg: {
+                    rating: true,
+                },
+            });
+
+        /// Check if current user has favorited this book 
+
+
+
+
+        })
+    )
+
 
 
     } catch (error) {
