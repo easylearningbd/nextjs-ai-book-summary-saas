@@ -47,12 +47,18 @@ export default function BooksPage(){
     const [totalPages, setTotalPages] = useState(1);
     const [user, setUser] = useState<any>(null);
 
+    useEffect(() => {
+        fetchUser();
+        fetchCategories();
+    },[]);
+
 
     async function fetchUser(){
         try {
             const response = await fetch("/api/user/profile");
             if (response.ok) {
                 const data = await response.json();
+                 console.log("user data:", data);
                 setUser(data);
             }
         } catch (error) {
@@ -65,6 +71,7 @@ export default function BooksPage(){
             const response = await fetch("/api/user/categories");
             if (response.ok) {
                 const data = await response.json();
+                 console.log("category data:", data);
                 setCategories(data);
             }
             
@@ -73,7 +80,18 @@ export default function BooksPage(){
         }
     }
 
-
+const handleSignOut = async () => {
+    try {
+        const response = await fetch("/api/auth/signout",{
+            method: "POST"
+        });
+        if (response.ok) {
+            window.location.href = "/";
+        }
+    } catch (error) {
+        console.error("Sign out error", error);
+    }
+};
 
 
 
@@ -107,27 +125,27 @@ export default function BooksPage(){
         </div>
     </div>
     <div className="flex items-center space-x-4">
-     
+     {user ? (
         <>
             <div className="hidden md:block text-right">
-            <p className="text-sm font-medium text-gray-900">fullName</p>
-            <p className="text-xs text-gray-600">subscriptionTier</p>
+            <p className="text-sm font-medium text-gray-900">{user.fullName}</p>
+            <p className="text-xs text-gray-600">{user.subscriptionTier}</p>
             </div>
             <button
-            
+            onClick={handleSignOut}
             className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
             Sign Out
             </button>
         </>
-        
+         ) : ( 
         <Link
             href="/login"
             className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
         >
             Sign In
         </Link>
-       
+       )}
     </div>
     </div>
 </div>
@@ -165,21 +183,26 @@ export default function BooksPage(){
     <div>
     <p className="text-sm font-semibold text-gray-700 mb-3">Filter by Category:</p>
     <div className="flex flex-wrap gap-2">
-        <button
-         
+        
+        <button 
         className={`px-4 py-2 rounded-lg font-medium transition-colors bg-indigo-600 text-white`}
         >
         All Categories
         </button>
-     
+     {categories.map((category) => ( 
         <button
+        key={category.id}    
             
-            
-            className={`px-4 py-2 rounded-lg font-medium transition-colors bg-indigo-600 text-white`}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors 
+                ${selectedCategory === category.id.toString()
+                    ? "bg-indigo-600 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                } `}
         >
-           icon
+          {category.icon && <span className="mr-2">{category.icon}</span> }
+          {category.name}
         </button>
-       
+       ))}
     </div>
     </div>
 </div>
