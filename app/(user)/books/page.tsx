@@ -80,6 +80,39 @@ export default function BooksPage(){
         }
     }
 
+    async function fetchBooks(){
+        setLoading(true);
+
+        try {
+            
+            const params = new URLSearchParams({
+                page: currentPage.toString(),
+                limit: "12",
+            });
+
+        if(searchQuery) params.append("search", searchQuery);
+        if(selectedCategory) params.append("category",selectedCategory);
+
+        const response = await fetch(`/api/books?${params}`);
+        if (response.ok) {
+            const data = await response.json();
+            setBooks(data.books);
+            setTotalPages(data.pagination.totalPages);
+        }
+
+        } catch (error) {
+            console.error("Failed to fetch books data", error);
+        }finally {
+             setLoading(false);
+        }
+    
+    }
+
+
+
+
+
+
 const handleSignOut = async () => {
     try {
         const response = await fetch("/api/auth/signout",{
