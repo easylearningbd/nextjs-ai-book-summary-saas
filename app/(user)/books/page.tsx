@@ -109,6 +109,28 @@ export default function BooksPage(){
     }
 
 
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        setCurrentPage(1);
+        updateURL();
+    }
+
+    const handleCategoryChange = (categoryId: string) => {
+        setSelectedCategory(categoryId);
+        setCurrentPage(1);
+    }
+
+    const updateURL = () => {
+        const params = new URLSearchParams();
+        if(searchQuery) params.append("search", searchQuery);
+        if(selectedCategory) params.append("category", selectedCategory);
+        if(currentPage > 1) params.append("page", currentPage.toString());
+        router.push(`/books?${params}`);
+    };
+
+
+
+
 
 
 
@@ -194,13 +216,13 @@ const handleSignOut = async () => {
 
 {/* Search and Filters */}
 <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-8 shadow-sm">
-    <form   className="mb-6">
+    <form onSubmit={handleSearch}  className="mb-6">
     <div className="flex gap-4">
         <input
         type="text"
         placeholder="Search books by title, author, or keywords..."
-        value="searchQuery"
-         
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
         className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         <button
@@ -218,14 +240,19 @@ const handleSignOut = async () => {
     <div className="flex flex-wrap gap-2">
         
         <button 
-        className={`px-4 py-2 rounded-lg font-medium transition-colors bg-indigo-600 text-white`}
+        onClick={() => handleCategoryChange("")}
+        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            selectedCategory === ""
+            ? "bg-indigo-600 text-white"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+        }`}
         >
         All Categories
         </button>
      {categories.map((category) => ( 
         <button
         key={category.id}    
-            
+            onClick={() => handleCategoryChange(category.id.toString())}
             className={`px-4 py-2 rounded-lg font-medium transition-colors 
                 ${selectedCategory === category.id.toString()
                     ? "bg-indigo-600 text-white"
