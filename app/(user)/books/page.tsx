@@ -52,13 +52,18 @@ export default function BooksPage(){
         fetchCategories();
     },[]);
 
+    useEffect(() => {
+        fetchBooks(); 
+    },[searchQuery,selectedCategory,currentPage]);
+
+
 
     async function fetchUser(){
         try {
             const response = await fetch("/api/user/profile");
             if (response.ok) {
                 const data = await response.json();
-                 console.log("user data:", data);
+                // console.log("user data:", data);
                 setUser(data);
             }
         } catch (error) {
@@ -71,7 +76,7 @@ export default function BooksPage(){
             const response = await fetch("/api/user/categories");
             if (response.ok) {
                 const data = await response.json();
-                 console.log("category data:", data);
+                // console.log("category data:", data);
                 setCategories(data);
             }
             
@@ -96,6 +101,7 @@ export default function BooksPage(){
         const response = await fetch(`/api/books?${params}`);
         if (response.ok) {
             const data = await response.json();
+            //console.log("book data:", data);
             setBooks(data.books);
             setTotalPages(data.pagination.totalPages);
         }
@@ -268,43 +274,43 @@ const handleSignOut = async () => {
 </div>
 
 {/* Books Grid */}
- 
+ {loading ? ( 
     <div className="flex items-center justify-center py-20">
     <div className="text-xl text-gray-600">Loading books...</div>
     </div>
- 
+ ) : books.length === 0 ? (
     <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
     <div className="text-6xl mb-4">📚</div>
     <h3 className="text-2xl font-bold text-gray-900 mb-2">No books found</h3>
     <p className="text-gray-600">Try adjusting your search or filters</p>
     </div>
- 
+  ) : (
     <>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-        
+        {books.map((book) => ( 
         <div
-            
+            key={book.id}
             className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
         >
-            <Link href={`/books/id`}>
+            <Link href={`/books/${book.id}`}>
             <div className="relative h-64 bg-gray-100">
-                
+            {book.coverImageUrl ? (    
                 <Image
-                    src="" 
-                    alt="" 
-                    
+                    src={book.coverImageUrl} 
+                    alt={book.title} 
+                    fill
                     className="object-cover"
                 />
-                 
+                 ) : (
                 <div className="flex items-center justify-center h-full text-gray-400">
                     <span className="text-6xl">📖</span>
                 </div>
-                
+                )} 
                 <button
                 
                 className="absolute top-3 right-3 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
                 >
-                <span className="text-xl">❤️" : "🤍"</span>
+                <span className="text-xl"> {book.isFavorited ? "❤️" : "🤍"} </span>
                 </button>
             </div>
             </Link>
@@ -312,8 +318,8 @@ const handleSignOut = async () => {
             <div className="p-4">
             <div className="mb-2">
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">
-                 <span className="mr-1">icon</span> 
-               name
+                 {book.category.icon && <span className="mr-1">{book.category.icon}</span> }                 
+               {book.category.name}
                 </span>
             </div>
 
@@ -344,7 +350,7 @@ const handleSignOut = async () => {
             
             </div>
         </div>
-        
+        ))}
     </div>
 
     {/* Pagination */}
@@ -375,11 +381,10 @@ const handleSignOut = async () => {
         >
             Next
         </button>
-        </div>
- 
+        </div> 
     </>
- 
+    )}
 </div>
     </div>
-    )
+    );
 }
