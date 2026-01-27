@@ -1,0 +1,405 @@
+"use client"
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
+import Image from "next/image"
+import toast from "react-hot-toast"
+
+
+interface Book {
+    id: number;
+    title: string;
+    author: string;
+    description: string;
+    coverImageUrl: string;
+    originalPdfUrl: string | null;
+    summary: {
+        id: number;
+        mainSummary: string | null;
+        keyTakeaways: any;
+        fullSummary: string | null;
+        tableOfContents: any;
+    } | null;
+    chapters: Array<{
+        id: number;
+        chapterNumber: number;
+        chapterTitle: string;
+        chapterSummary: string;
+        audioUrl: string | null;
+        audioDuration: number;
+    }>;
+    category: {
+        id: number;
+        name: string;
+        slug: string;
+        icon: string;
+    };
+    reviews: Review[];
+    averageRating: number;
+    isFavorited: boolean;
+    userSubscriptionTier: string;
+    _count: {
+        reviews: number;
+        favorites: number;
+    };
+}
+
+
+interface Review {
+    id: number;
+    rating: number;
+    reviewText: string | null;
+    isVerifiedPurchase: boolean;
+    createdAt: string;
+    user: {
+        id: string;
+        fullName: string;
+        email: string;
+    };
+}
+
+export default function BookDetailsPage(){
+
+    return (
+         <div className="min-h-screen bg-gray-50">
+      {/* Navigation Header */}
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+<div className="max-w-7xl mx-auto px-4">
+    <div className="flex items-center justify-between h-16">
+    <div className="flex items-center space-x-8">
+        <Link href="/" className="flex items-center space-x-2">
+        <div className="w-10 h-10 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
+            <span className="text-white font-bold text-xl">B</span>
+        </div>
+        <span className="text-xl font-bold text-gray-900">BookWise</span>
+        </Link>
+        <div className="hidden md:flex items-center space-x-6">
+        <Link href="/dashboard" className="text-gray-600 hover:text-gray-900 font-medium">
+            Dashboard
+        </Link>
+        <Link href="/books" className="text-indigo-600 font-semibold hover:text-indigo-700">
+            Browse Books
+        </Link>
+        <Link href="/favorites" className="text-gray-600 hover:text-gray-900 font-medium">
+            My Favorites
+        </Link>
+        <Link href="/pricing" className="text-gray-600 hover:text-gray-900 font-medium">
+            Pricing
+        </Link>
+        </div>
+    </div>
+    <div className="flex items-center space-x-4">
+        
+        <>
+            <div className="hidden md:block text-right">
+            <p className="text-sm font-medium text-gray-900">fullName</p>
+            <p className="text-xs text-gray-600">subscriptionTier</p>
+            </div>
+            <button
+            
+            className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+            Sign Out
+            </button>
+        </>
+        
+        <Link
+            href="/login"
+            className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+        >
+            Sign In
+        </Link>
+        
+    </div>
+    </div>
+</div>
+</nav>
+
+{/* Main Content */}
+<div className="max-w-7xl mx-auto px-4 py-12">
+<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    {/* Left Column - Book Info */}
+    <div className="lg:col-span-1">
+    <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm sticky top-24">
+        <div className="relative h-96 bg-gray-100 rounded-xl mb-4 overflow-hidden">
+        
+            <Image src=""  alt=""  fill className="object-cover" />
+            
+            <div className="flex items-center justify-center h-full text-gray-400">
+            <span className="text-8xl">📖</span>
+            </div>
+        
+        </div>
+
+        <div className="mb-4">
+        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-indigo-100 text-indigo-700">
+            <span className="mr-1">icon</span> 
+            category.name
+        </span>
+        </div>
+
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">title</h1>
+        <p className="text-lg text-gray-600 mb-4">by author</p>
+
+        <div className="flex items-center justify-between mb-4">
+        
+        <span className="text-sm text-gray-600">reviews reviews</span>
+        </div>
+
+        <div className="space-y-3">
+        <button
+            
+            className={`w-full py-3 rounded-lg font-semibold transition-colors bg-red-100 text-red-700 hover:bg-red-200`}
+        >
+            "❤️ Remove from Favorites" : "🤍 Add to Favorites" 
+        </button>
+
+        <button
+            
+            
+            className={`w-full py-3 rounded-lg font-semibold transition-colors bg-indigo-600 text-white hover:bg-indigo-700`}
+        >
+            "📥 Download PDF" : "🔒 Upgrade for PDF" 
+        </button>
+        </div>
+
+    
+        <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-sm text-yellow-800 font-medium mb-2">
+            🔒 Limited Access
+            </p>
+            <p className="text-xs text-yellow-700 mb-3">
+            You can only listen to 10 seconds of audio. Upgrade to premium for full access!
+            </p>
+            <Link
+            href="/pricing"
+            className="block w-full py-2 bg-yellow-600 text-white rounded-lg font-semibold text-center hover:bg-yellow-700 text-sm"
+            >
+            View Plans
+            </Link>
+        </div>
+        
+    </div>
+    </div>
+
+    {/* Right Column - Summary & Audio */}
+    <div className="lg:col-span-2 space-y-6">
+    {/* Description */}
+    <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">About This Book</h2>
+        <p className="text-gray-700 leading-relaxed">description</p>
+    </div>
+
+    {/* Audio Player */}
+        
+        <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Audio Summary</h2>
+
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white">
+            <div className="flex items-center justify-between mb-4">
+            <div className="flex-1">
+                <p className="text-sm text-white/80">Now Playing</p>
+                <p className="font-semibold">title</p>
+                <p className="text-sm text-white/90 mt-1">
+                Chapter  
+                </p>
+            </div>
+            <button
+                
+                className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-indigo-600 hover:bg-gray-100 transition-colors"
+            >
+                <span className="text-2xl">  "⏸️" : "▶️" </span>
+            </button>
+            </div>
+
+            {/* Chapter Navigation */}
+            <div className="flex items-center justify-center space-x-4 mb-4">
+            <button
+                
+                className="px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                ⏮️ Previous
+            </button>
+            <span className="text-sm text-white/80">
+                Chapter  
+            </span>
+            <button
+                
+                className="px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                Next ⏭️
+            </button>
+            </div>
+
+            <div className="space-y-2">
+            <input
+                type="range"
+                min="0"
+                max=""
+                value=""
+                
+                className="w-full h-2 bg-white/30 rounded-lg appearance-none cursor-pointer"
+            />
+            <div className="flex justify-between text-sm text-white/80">
+                <span>currentTime</span>
+                <span>duration</span>
+            </div>
+            </div>
+
+            <audio
+                
+            src=""
+            
+            />
+
+            
+            <div className="mt-4 p-3 bg-yellow-500 rounded-lg">
+                <p className="text-sm font-medium text-white">
+                ⚠️ Free users can only listen to 10 seconds. Upgrade for full access!
+                </p>
+            </div>
+            
+        </div>
+
+        {/* Chapter Selection */}
+        
+            <div className="mt-4">
+            <p className="text-sm font-semibold text-gray-700 mb-3">Select Chapter:</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                
+                <button
+                    
+                    
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-indigo-600 text-white`}
+                >
+                    Ch.  
+                </button>
+                
+            </div>
+            </div>
+            
+        </div>
+    
+
+    {/* Chapters */}
+    
+        <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Table of Contents</h2>
+        <div className="space-y-4">
+            
+            <div   className="border border-gray-200 rounded-lg p-4 hover:border-indigo-500 transition-colors">
+                <div className="flex items-start justify-between mb-2">
+                <div className="flex-1">
+                    <h3 className="font-bold text-gray-900">
+                    Chapter  
+                    </h3>
+                    
+                    <p className="text-sm text-gray-700 mt-2 leading-relaxed">
+                    chapterSummary
+                    </p>
+                    
+                </div>
+                </div>
+            </div>
+            
+        </div>
+        </div>
+    
+
+    {/* Reviews Section */}
+    <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+        <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">Reviews</h2>
+        
+            <button
+            
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700"
+            >
+            Write a Review
+            </button>
+        
+        </div>
+
+        
+        <form   className="mb-8 p-6 bg-gray-50 rounded-xl">
+            <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Your Rating
+            </label>
+            ddd
+            </div>
+
+            <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                Your Review
+                </label>
+                <span className={`text-xs text-red-600`}>
+                (min: 10)
+                </span>
+            </div>
+            <textarea
+            
+            
+                required
+                rows={4}
+                maxLength={1000}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="Share your thoughts about this book (minimum 10 characters)..."
+            />
+            </div>
+
+            <div className="flex space-x-3">
+            <button
+                type="submit"
+                className="px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700"
+            >
+                Submit Review
+            </button>
+            <button
+                type="button"
+                
+                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300"
+            >
+                Cancel
+            </button>
+            </div>
+        </form>
+
+        
+        <p className="text-gray-600 text-center py-8">
+            No reviews yet. Be the first to review this book!
+        </p>
+    
+        <div className="space-y-6">
+            
+            <div  className="border-b border-gray-200 pb-6 last:border-0">
+                <div className="flex items-start justify-between mb-2">
+                <div>
+                    <p className="font-semibold text-gray-900">fullName</p>
+                    <div className="flex items-center space-x-2 mt-1">
+                    
+                    
+                        <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full font-semibold">
+                        ✓ Verified Purchase
+                        </span>
+                    
+                    </div>
+                </div>
+                <span className="text-sm text-gray-500">
+                    createdAt
+                </span>
+                </div>
+                <p className="text-gray-700 leading-relaxed">reviewText</p>
+            </div>
+            
+        </div>
+    
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    );
+
+}
