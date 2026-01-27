@@ -62,7 +62,7 @@ export default function BookDetailsPage({ params }: { params: Promise<{ id: stri
 
     const router = useRouter();
     const audioRef = useRef<HTMLAudioElement>(null);
-    const [resolvedParams, setReslovedParams] = useState<{ id: string } | null>(null);
+    const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
     const [book, setBook] = useState<Book | null>(null);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<any>(null);
@@ -73,9 +73,16 @@ export default function BookDetailsPage({ params }: { params: Promise<{ id: stri
     const [showReviewForm, setShowReviewForm] = useState(false);
     const [reviewData, setReviewData] = useState({ rating: 5, comment: "" });
 
+    useEffect(() => {
+        params.then((p) => setResolvedParams(p));
+    },[params])
+
      useEffect(() => { 
+        if (resolvedParams) {
             fetchUser(); 
             fetchBook()
+        }
+            
     },[resolvedParams]);
 
      async function fetchUser(){
@@ -96,9 +103,10 @@ export default function BookDetailsPage({ params }: { params: Promise<{ id: stri
         setLoading(true);
         
         try {
-            const response = await fetch(`/api/book/${resolvedParams.id}`);
+            const response = await fetch(`/api/books/${resolvedParams.id}`);
             if (response.ok) {
                 const data = await response.json();
+                console.log("user details:", data);
                 setBook(data);
             } else if (response.status === 404){
                 toast.error("Book not found");

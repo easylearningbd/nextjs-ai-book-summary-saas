@@ -75,10 +75,44 @@ export async function GET(
         });
 
 
+        if (!book) {
+            return NextResponse.json({ error: "Book not found"}, {status: 404});
+        }
+        // Calaculate avarage ratings 
+  
+        const avgRating = await prisma.bookReview.aggregate({
+            where: {
+                bookId: book.id,
+                isApproved: true,
+            },
+            _avg: {
+                rating: true,
+            },
+        });
+
+         /// Check if current user has favorited this book
+        let isFavorited = false;
+        if (session?.user) {
+            const favorite = await prisma.userFavorite.findFirst({
+                where: {
+                    userId: session.user.id,
+                    bookId: book.id,
+                },
+            });
+            isFavorited = !!favorite;
+        }
+
+    // Get user subscription tier
+    const userSubscriptionTier = session?.user?.subscriptionTier || "FREE";
+
+    return NextResponse.json({
+        ...book,
+        averageRating: avgRating._avg.rating || 0,
+        isFavorited,
+        userSubscriptionTier,
+    });
     } catch (error) {
-        
+        console.error("Error Fetching book", error);
     }
-
-
 
 }
