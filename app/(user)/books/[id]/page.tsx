@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
@@ -58,12 +58,57 @@ interface Review {
     };
 }
 
-export default function BookDetailsPage(){
+export default function BookDetailsPage({ params }: { params: Promise<{ id: string}> }){
+
+    const router = useRouter();
+    const audioRef = useRef<HTMLAudioElement>(null);
+    const [resolvedParams, setReslovedParams] = useState<{ id: string } | null>(null);
+    const [book, setBook] = useState<Book | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<any>(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [duration, setDuration] = useState(0);
+    const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
+    const [showReviewForm, setShowReviewForm] = useState(false);
+    const [reviewData, setReviewData] = useState({ rating: 5, comment: "" });
+
+     useEffect(() => { 
+            fetchUser(); 
+    },[resolvedParams]);
+
+     async function fetchUser(){
+        try {
+            const response = await fetch("/api/user/profile");
+            if (response.ok) {
+                const data = await response.json();
+                 //console.log("user data:", data);
+                setUser(data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch user", error);
+        }
+    }
+
+    const handleSignOut = async () => {
+    try {
+        const response = await fetch("/api/auth/signout",{
+            method: "POST"
+        });
+        if (response.ok) {
+            window.location.href = "/";
+        }
+    } catch (error) {
+        console.error("Sign out error", error);
+    }
+};
+
+
 
     return (
          <div className="min-h-screen bg-gray-50">
       {/* Navigation Header */}
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+   <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
 <div className="max-w-7xl mx-auto px-4">
     <div className="flex items-center justify-between h-16">
     <div className="flex items-center space-x-8">
@@ -89,27 +134,27 @@ export default function BookDetailsPage(){
         </div>
     </div>
     <div className="flex items-center space-x-4">
-        
+     {user ? (
         <>
             <div className="hidden md:block text-right">
-            <p className="text-sm font-medium text-gray-900">fullName</p>
-            <p className="text-xs text-gray-600">subscriptionTier</p>
+            <p className="text-sm font-medium text-gray-900">{user.fullName}</p>
+            <p className="text-xs text-gray-600">{user.subscriptionTier}</p>
             </div>
             <button
-            
+            onClick={handleSignOut}
             className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
             Sign Out
             </button>
         </>
-        
+         ) : ( 
         <Link
             href="/login"
             className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
         >
             Sign In
         </Link>
-        
+       )}
     </div>
     </div>
 </div>
