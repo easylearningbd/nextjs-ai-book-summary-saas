@@ -92,9 +92,9 @@ export default function BooksPage(){
             
             const params = new URLSearchParams({
                 page: currentPage.toString(),
-                limit: "4",
+                limit: "12",
             });
-
+ 
         if(searchQuery) params.append("search", searchQuery);
         if(selectedCategory) params.append("category",selectedCategory);
 
@@ -154,6 +154,18 @@ const handleSignOut = async () => {
     }
 };
 
+const randerStars = (rating: number) => {
+    return (
+        <div className="flex items-center space-x-1">
+            {[...Array(5)].map((_,i) => (
+                <span key={i} className={i < Math.round(rating) ? "text-yellow-400" : "text-gray-300"}>
+                    ★
+                </span>
+            ))}
+        <span className="text-sm text-gray-600 ml-2">({rating.toFixed(1)})</span>
+        </div>
+    );
+};
 
 
 
@@ -334,8 +346,8 @@ const handleSignOut = async () => {
             <p className="text-sm text-gray-700 mb-3 line-clamp-2">{book.description}</p>
 
             <div className="flex items-center justify-between">
-                
-                <span className="text-xs text-gray-500">  reviews</span>
+                {randerStars(book.averageRating)}
+                <span className="text-xs text-gray-500">{book._count.reviews}  reviews</span>
             </div>
 
             {user?.subscriptionTier === "FREE" && ( 
