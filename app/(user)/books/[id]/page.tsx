@@ -120,6 +120,69 @@ export default function BookDetailsPage({ params }: { params: Promise<{ id: stri
 
     }
 
+    const handlePlayPause = () => {
+        if(!audioRef.current) return;
+        if (isPlaying) {
+            audioRef.current.pause();
+        } else {
+            audioRef.current.play();
+        }
+        setIsPlaying(!isPlaying);
+    }
+
+
+    const handleChapterChange = (index: number) => {
+        setCurrentChapterIndex(index);
+        setCurrentTime(0);
+        setIsPlaying(false);
+
+        // Reset audio when chapter changes 
+        if (audioRef.current) {
+            audioRef.current.currentTime = 0;
+            audioRef.current.load();
+        }
+    }
+
+    const handleNextChapter = () => {
+        if (!book) return;
+        const chapterWithAudio = book.chapters.filter(ch => ch.audioUrl);
+        if (currentChapterIndex < chapterWithAudio.length - 1) {
+            handleChapterChange(currentChapterIndex + 1)
+        } 
+    };
+
+    const handlePreviousChapter = () => {
+        if (currentChapterIndex > 0) {
+            handleChapterChange(currentChapterIndex - 1);
+        }
+    }
+
+    const handleTimeUpdate = () => {
+        if (audioRef.current) {
+            setCurrentTime(audioRef.current.currentTime);
+        }
+    }
+
+    const handleLoadMetadata = () => {
+        if (audioRef.current) {
+            setDuration(audioRef.current.duration);
+        }
+    }
+
+    const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const time = parseFloat(e.target.value);
+        if (audioRef.current) {
+            audioRef.current.currentTime = time;
+            setCurrentTime(time);
+        }
+    };
+
+   const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2,"0")}`;
+   }
+
 
 
 
