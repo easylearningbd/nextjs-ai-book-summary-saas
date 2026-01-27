@@ -70,17 +70,35 @@ export async function GET(request: NextRequest) {
                 },
             });
 
-        /// Check if current user has favorited this book 
+        /// Check if current user has favorited this book
+        let isFavorited = false;
+        if (session?.user) {
+            const favorite = await prisma.userFavorite.findFirst({
+                where: {
+                    userId: session.user.id,
+                    bookId: book.id,
+                },
+            });
+            isFavorited = !!favorite;
+        }
+        return {
+            ...book,
+            averageRating: avgRating._avg.rating || 0,
+            isFavorited,
+        };
+        }) 
+    );
 
-
-
-
-        })
-    )
-
-
-
+    return NextResponse.json({
+        books: booksWithRatings,
+        pagination: {
+            page,
+            limit,
+            totalCount,
+            totalPage: Math.ceil(totalCount / limit),
+        },
+    });
     } catch (error) {
-        
+        console.error("Error fetching books", error);
     }
 }
