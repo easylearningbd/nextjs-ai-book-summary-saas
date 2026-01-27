@@ -75,6 +75,7 @@ export default function BookDetailsPage({ params }: { params: Promise<{ id: stri
 
      useEffect(() => { 
             fetchUser(); 
+            fetchBook()
     },[resolvedParams]);
 
      async function fetchUser(){
@@ -89,6 +90,32 @@ export default function BookDetailsPage({ params }: { params: Promise<{ id: stri
             console.error("Failed to fetch user", error);
         }
     }
+
+    async function fetchBook(){
+        if (!resolvedParams) return; 
+        setLoading(true);
+        
+        try {
+            const response = await fetch(`/api/book/${resolvedParams.id}`);
+            if (response.ok) {
+                const data = await response.json();
+                setBook(data);
+            } else if (response.status === 404){
+                toast.error("Book not found");
+                router.push("/books");
+            }
+        } catch (error) {
+            console.error("Failed to fetch book", error);
+        }finally{
+             setLoading(false);
+        }
+
+    }
+
+
+
+
+
 
     const handleSignOut = async () => {
     try {
