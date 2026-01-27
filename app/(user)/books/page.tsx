@@ -92,7 +92,7 @@ export default function BooksPage(){
             
             const params = new URLSearchParams({
                 page: currentPage.toString(),
-                limit: "12",
+                limit: "4",
             });
 
         if(searchQuery) params.append("search", searchQuery);
@@ -323,22 +323,22 @@ const handleSignOut = async () => {
                 </span>
             </div>
 
-            <Link href={`/books/id`}>
+            <Link href={`/books/${book.id}`}>
                 <h3 className="text-lg font-bold text-gray-900 mb-1 line-clamp-2 hover:text-indigo-600">
-              title
+             {book.title}
                 </h3>
             </Link>
 
-            <p className="text-sm text-gray-600 mb-2">by author</p>
+            <p className="text-sm text-gray-600 mb-2">by {book.author}</p>
 
-            <p className="text-sm text-gray-700 mb-3 line-clamp-2">description</p>
+            <p className="text-sm text-gray-700 mb-3 line-clamp-2">{book.description}</p>
 
             <div className="flex items-center justify-between">
                 
                 <span className="text-xs text-gray-500">  reviews</span>
             </div>
 
-           
+            {user?.subscriptionTier === "FREE" && ( 
                 <div className="mt-3 pt-3 border-t border-gray-200">
                 <Link
                     href="/pricing"
@@ -347,41 +347,46 @@ const handleSignOut = async () => {
                     🔒 Upgrade to unlock full audio & PDF
                 </Link>
                 </div>
-            
+            )}
             </div>
         </div>
         ))}
     </div>
 
     {/* Pagination */}
-     
+     {totalPages > 1 && ( 
         <div className="flex items-center justify-center space-x-2">
         <button
-            
-            
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
             className="px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
             Previous
         </button>
 
-        
+        {[...Array(totalPages)].map((_,i) => ( 
             <button
-             
-            
-            className={`px-4 py-2 rounded-lg font-medium bg-indigo-600 text-white`}
+             key={i + 1}
+            onClick={() =>  setCurrentPage(i + 1)}
+            className={`px-4 py-2 rounded-lg font-medium ${
+                currentPage === i + 1 
+                ? "bg-indigo-600 text-white"
+                : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+            } `}
             >
-           
+           {i + 1}
             </button>
-       
+         ))}
 
         <button
-             
-           
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}           
             className="px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
             Next
         </button>
         </div> 
+        )}
     </>
     )}
 </div>
