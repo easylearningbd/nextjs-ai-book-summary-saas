@@ -6,15 +6,40 @@ import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import toast from "react-hot-toast"
 
+interface Favorite{
+    id: number;
+    bookId: number;
+    createdAt: string;
+    book: {
+        id: number;
+        title: string;
+        author: string;
+        description: string;
+        coverImageUrl: string;
+        category: {
+            id: number;
+            name: string;
+            slug: string;
+            icon: string
+        };
+        averageRating: number;
+        _count: {
+            reviews: number;
+            favorites: number;
+        }
+    }
+}
+
 export default function FavoritesPage(){
 
     const router = useRouter();
-    // const [favorites, setFavorites] = useState<Favorite[]>([]);
+    const [favorites, setFavorites] = useState<Favorite[]>([]);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
         fetchUser(); 
+        fetchFavorites()
     },[]);
 
     async function fetchUser(){
@@ -30,6 +55,22 @@ export default function FavoritesPage(){
         }
     }
 
+    async function fetchFavorites(){
+        setLoading(true);
+        try {
+            const response = await fetch("/api/user/favorites");
+            if (response.ok) {
+                const data = await response.json();
+                setFavorites(data);
+            } else if (response.status === 401){
+                router.push("/login");
+            }
+        } catch (error) {
+            console.error("Failed to fetch favorites", error);
+        }finally{
+             setLoading(false);
+        }
+    }
 
 
     const handleSignOut = async () => {
