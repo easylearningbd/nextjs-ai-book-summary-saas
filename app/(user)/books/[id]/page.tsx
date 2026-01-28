@@ -431,49 +431,53 @@ if (loading || !book) {
         </div>
 
         {/* Chapter Selection */}
-        
+        {chaptersWithAudio.length > 1 && ( 
             <div className="mt-4">
             <p className="text-sm font-semibold text-gray-700 mb-3">Select Chapter:</p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                
+                {chaptersWithAudio.map((chapter, index) => ( 
                 <button
-                    
-                    
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-indigo-600 text-white`}
+                    key={chapter.id}
+                    onClick={() => handleChapterChange(index)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        currentChapterIndex === index 
+                        ? "bg-indigo-600 text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
                 >
-                    Ch.  
+                    Ch. {chapter.chapterNumber}  
                 </button>
-                
+                ))}
             </div>
             </div>
-            
+            )}
         </div>
     )}
 
     {/* Chapters */}
-    
+    {chapters.length > 0 && ( 
         <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Table of Contents</h2>
         <div className="space-y-4">
-            
-            <div   className="border border-gray-200 rounded-lg p-4 hover:border-indigo-500 transition-colors">
+           {chapters.map((chapter: any, index: number) => (
+            <div key={index}  className="border border-gray-200 rounded-lg p-4 hover:border-indigo-500 transition-colors">
                 <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
                     <h3 className="font-bold text-gray-900">
-                    Chapter  
+                    Chapter {chapter.chapterNumber}: {chapter.chapterTitle} 
                     </h3>
-                    
+                    {chapter.chapterSummary && ( 
                     <p className="text-sm text-gray-700 mt-2 leading-relaxed">
-                    chapterSummary
+                    {chapter.chapterSummary}
                     </p>
-                    
+                    ) }
                 </div>
                 </div>
             </div>
-            
+             ))} 
         </div>
         </div>
-    
+    )}
 
     {/* Reviews Section */}
     <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
