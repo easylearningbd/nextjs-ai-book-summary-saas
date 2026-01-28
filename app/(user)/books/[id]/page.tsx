@@ -184,7 +184,22 @@ export default function BookDetailsPage({ params }: { params: Promise<{ id: stri
    }
 
 
+   const handleDownloadPDF = () => {
+    if (!user) {
+        toast.error("Please log in to download PDFs");
+        router.push("/login");
+        return;
+    }
+    if (user.subscriptionTier === "FREE") {
+        toast.error("Please upgrade to premuum to download PDFS");
+        router.push("/pricing");
+        return;
+    }
 
+    if (book?.originalPdfUrl) {
+        window.open(book.originalPdfUrl, "_blank");
+    }
+   };
 
 
 
@@ -315,8 +330,8 @@ if (loading || !book) {
         </button>
 
         <button
-            
-            
+            onClick={handleDownloadPDF}
+            disabled={!isPremiumUser}
             className={`w-full py-3 rounded-lg font-semibold transition-colors ${
                 isPremiumUser 
                 ? "bg-indigo-600 text-white hover:bg-indigo-700"
