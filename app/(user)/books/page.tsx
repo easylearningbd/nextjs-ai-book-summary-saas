@@ -135,6 +135,29 @@ export default function BooksPage(){
     };
 
 
+const handleToggleFavorite = async (bookId: number, isFavorited:boolean) => {
+        if (!user) {
+            toast.error("Please log in to add favorites");
+            router.push("/login");
+            return;
+        }
+  
+    try {
+
+        if (isFavorited) {
+            await fetch(`/api/user/favorites/${bookId}`, { method: "DELETE"});
+        } else {
+            await fetch("/api/user/favorites", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ bookId}),
+            });
+        }
+        fetchBooks()        
+    } catch (error) {
+        console.error("Failed to toggle favorites:", error);
+      }
+    };
 
 
 
@@ -319,7 +342,10 @@ const randerStars = (rating: number) => {
                 </div>
                 )} 
                 <button
-                
+                onClick={(e) => {
+                    e.preventDefault();
+                    handleToggleFavorite(book.id, book.isFavorited);
+                }}
                 className="absolute top-3 right-3 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
                 >
                 <span className="text-xl"> {book.isFavorited ? "❤️" : "🤍"} </span>
