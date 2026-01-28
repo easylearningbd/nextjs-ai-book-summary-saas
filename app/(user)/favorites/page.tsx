@@ -61,6 +61,7 @@ export default function FavoritesPage(){
             const response = await fetch("/api/user/favorites");
             if (response.ok) {
                 const data = await response.json();
+               // console.log("favorites data:", data);
                 setFavorites(data);
             } else if (response.status === 401){
                 router.push("/login");

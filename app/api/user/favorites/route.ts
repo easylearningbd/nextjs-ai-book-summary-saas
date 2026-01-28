@@ -7,6 +7,79 @@ const favoriteSchema = z.object({
     bookId: z.number().positive(),
 });
 
+export async function GET(request: NextRequest) {
+
+    try {
+
+         const session = await auth();
+
+         if (!session?.user) {
+            return NextResponse.json({ error: "Unauthorized" }, {status: 401});
+        }
+
+    const favorites = await prisma.userFavorite.findMany({
+        where: {
+            userId: session.user.id,
+        },
+        include: {
+            book:{
+                include: {
+                    category: {
+                        select: {
+                            id: true,
+                            name: true,
+                            slug: true,
+                            icon: true,
+                        },
+                    },
+                    _count: {
+                       select: {
+                         reviews: true,
+                         favorites: true,
+                       },
+                    },
+                },
+            },
+        },
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
+
+    // Calculate average rating for each book 
+    const favoritesWithRatings = await Promise.all(
+        favorites.map(async(favorite) => {
+            const avgRating = await prisma.bookReview.aggregate({
+                where: {
+                    bookId: favorite.book.id,
+                    isApproved: true
+                },
+                _avg:{
+                    rating: true,
+                },
+            });
+
+        return {
+            id: favorite.id,
+            bookId: favorite.bookId,
+            createdAt: favorite.createdAt,
+            book: {
+                ...favorite.book,
+                averageRating: avgRating._avg.rating || 0,
+            },
+        };
+        })
+    );
+
+    return NextResponse.json(favoritesWithRatings);
+      
+    } catch (error) {
+        console.error("Error Fetching favories",error);
+    }
+
+}
+
+
 
 /// Post or add data in favorites table 
 export async function POST(request: NextRequest){
