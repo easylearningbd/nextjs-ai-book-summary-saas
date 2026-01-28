@@ -120,6 +120,36 @@ export default function BookDetailsPage({ params }: { params: Promise<{ id: stri
 
     }
 
+    const handleToggleFavorite = async () => {
+        if (!user) {
+            toast.error("Please log in to add favorites");
+            router.push("/login");
+            return;
+        }
+
+        if(!book) return;
+
+    try {
+
+        if (book.isFavorited) {
+            await fetch(`/api/user/favorites/${book.id}`, { method: "DELETE"});
+        } else {
+            await fetch("/api/user/favorites", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ bookId: book.id}),
+            });
+        }
+        fetchBook()        
+    } catch (error) {
+        console.error("Failed to toggle favorites:", error);
+      }
+    };
+
+
+
+
+
     const handlePlayPause = () => {
         if(!audioRef.current) return;
         if (isPlaying) {
@@ -318,7 +348,7 @@ if (loading || !book) {
 
         <div className="space-y-3">
         <button
-            
+            onClick={handleToggleFavorite}
             className={`w-full py-3 rounded-lg font-semibold transition-colors 
                 ${
                     book.isFavorited
