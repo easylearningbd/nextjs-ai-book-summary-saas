@@ -201,7 +201,19 @@ export default function BookDetailsPage({ params }: { params: Promise<{ id: stri
     }
 };
 
+if (loading || !book) {
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="text-xl">Loading Book...</div>
+        </div>
+    )
+}
 
+   const summary = book.summary;
+   const chapters = book.chapters || [];
+   const chaptersWithAudio = chapters.filter(ch => ch.audioUrl);
+   const currentChapter = chaptersWithAudio[currentChapterIndex];
+   const isPremiumUser = user?.subscriptionTier !== "FREE";
 
     return (
          <div className="min-h-screen bg-gray-50">
@@ -265,24 +277,24 @@ export default function BookDetailsPage({ params }: { params: Promise<{ id: stri
     <div className="lg:col-span-1">
     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm sticky top-24">
         <div className="relative h-96 bg-gray-100 rounded-xl mb-4 overflow-hidden">
-        
-            <Image src=""  alt=""  fill className="object-cover" />
-            
+        {book.coverImageUrl ? ( 
+            <Image src={book.coverImageUrl}  alt={book.title}  fill className="object-cover" />
+            ) : (
             <div className="flex items-center justify-center h-full text-gray-400">
             <span className="text-8xl">📖</span>
             </div>
-        
+         )}
         </div>
 
         <div className="mb-4">
         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-indigo-100 text-indigo-700">
-            <span className="mr-1">icon</span> 
-            category.name
+           {book.category.icon && <span className="mr-1">{book.category.icon}</span> } 
+            {book.category.name}
         </span>
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">title</h1>
-        <p className="text-lg text-gray-600 mb-4">by author</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">{book.title}</h1>
+        <p className="text-lg text-gray-600 mb-4">by {book.author}</p>
 
         <div className="flex items-center justify-between mb-4">
         
@@ -292,21 +304,30 @@ export default function BookDetailsPage({ params }: { params: Promise<{ id: stri
         <div className="space-y-3">
         <button
             
-            className={`w-full py-3 rounded-lg font-semibold transition-colors bg-red-100 text-red-700 hover:bg-red-200`}
+            className={`w-full py-3 rounded-lg font-semibold transition-colors 
+                ${
+                    book.isFavorited
+                    ? "bg-red-100 text-red-700 hover:bg-red-200"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                } `}
         >
-            "❤️ Remove from Favorites" : "🤍 Add to Favorites" 
+           {book.isFavorited ? "❤️ Remove from Favorites" : "🤍 Add to Favorites"} 
         </button>
 
         <button
             
             
-            className={`w-full py-3 rounded-lg font-semibold transition-colors bg-indigo-600 text-white hover:bg-indigo-700`}
+            className={`w-full py-3 rounded-lg font-semibold transition-colors ${
+                isPremiumUser 
+                ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            } `}
         >
-            "📥 Download PDF" : "🔒 Upgrade for PDF" 
+          {isPremiumUser ? "📥 Download PDF" : "🔒 Upgrade for PDF"} 
         </button>
         </div>
 
-    
+        {!isPremiumUser && ( 
         <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <p className="text-sm text-yellow-800 font-medium mb-2">
             🔒 Limited Access
@@ -321,7 +342,7 @@ export default function BookDetailsPage({ params }: { params: Promise<{ id: stri
             View Plans
             </Link>
         </div>
-        
+        )}
     </div>
     </div>
 

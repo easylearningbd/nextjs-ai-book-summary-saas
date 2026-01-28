@@ -102,7 +102,7 @@ model Book {
   createdById          String   @map("created_by")
   createdAt            DateTime @default(now()) @map("created_at")
   updatedAt            DateTime @updatedAt @map("updated_at")
-
+ 
   // Relations
   category             Category           @relation(fields: [categoryId], references: [id])
   createdBy            User               @relation("BooksCreatedByUser", fields: [createdById], references: [id])
