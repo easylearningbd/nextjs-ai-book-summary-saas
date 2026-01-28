@@ -351,11 +351,11 @@ if (loading || !book) {
     {/* Description */}
     <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">About This Book</h2>
-        <p className="text-gray-700 leading-relaxed">description</p>
+        <p className="text-gray-700 leading-relaxed">{book.description}</p>
     </div>
 
     {/* Audio Player */}
-        
+      {chaptersWithAudio.length > 0 && currentChapter && (   
         <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Audio Summary</h2>
 
@@ -363,32 +363,34 @@ if (loading || !book) {
             <div className="flex items-center justify-between mb-4">
             <div className="flex-1">
                 <p className="text-sm text-white/80">Now Playing</p>
-                <p className="font-semibold">title</p>
+                <p className="font-semibold">{book.title}</p>
                 <p className="text-sm text-white/90 mt-1">
-                Chapter  
+                Chapter {currentChapter.chapterNumber}: {currentChapter.chapterTitle} 
                 </p>
             </div>
             <button
-                
+                onClick={handlePlayPause}
                 className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-indigo-600 hover:bg-gray-100 transition-colors"
             >
-                <span className="text-2xl">  "⏸️" : "▶️" </span>
+                <span className="text-2xl"> {isPlaying ? "⏸️" : "▶️"}</span>
             </button>
             </div>
 
             {/* Chapter Navigation */}
             <div className="flex items-center justify-center space-x-4 mb-4">
             <button
-                
+                onClick={handlePreviousChapter}
+                disabled={currentChapterIndex === 0}
                 className="px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 ⏮️ Previous
             </button>
             <span className="text-sm text-white/80">
-                Chapter  
+                Chapter {currentChapterIndex + 1} of {chaptersWithAudio.length}
             </span>
             <button
-                
+                onClick={handleNextChapter}
+                disabled={currentChapterIndex === chaptersWithAudio.length - 1}
                 className="px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 Next ⏭️
@@ -399,30 +401,33 @@ if (loading || !book) {
             <input
                 type="range"
                 min="0"
-                max=""
-                value=""
-                
+                max={duration || 0}
+                value={currentTime}
+                onChange={handleSeek}
                 className="w-full h-2 bg-white/30 rounded-lg appearance-none cursor-pointer"
             />
             <div className="flex justify-between text-sm text-white/80">
-                <span>currentTime</span>
-                <span>duration</span>
+                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(duration)}</span>
             </div>
             </div>
 
             <audio
-                
-            src=""
-            
+                ref={audioRef}
+                src={currentChapter?.audioUrl || ""}
+                onTimeUpdate={handleTimeUpdate}
+                onLoadedMetadata={handleLoadMetadata}
+                onEnded={handleNextChapter}
+                key={currentChapterIndex}
             />
 
-            
+            {!isPremiumUser && ( 
             <div className="mt-4 p-3 bg-yellow-500 rounded-lg">
                 <p className="text-sm font-medium text-white">
                 ⚠️ Free users can only listen to 10 seconds. Upgrade for full access!
                 </p>
             </div>
-            
+            )}
         </div>
 
         {/* Chapter Selection */}
@@ -443,7 +448,7 @@ if (loading || !book) {
             </div>
             
         </div>
-    
+    )}
 
     {/* Chapters */}
     
