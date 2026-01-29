@@ -234,7 +234,48 @@ export default function BookDetailsPage({ params }: { params: Promise<{ id: stri
 
    const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault(); 
-   }
+
+    if (!user) {
+        toast.error("Please log in to submit a review");
+        router.push("/login");
+    }
+      /// Validation comment length 
+    if (reviewData.comment.trim().length < 10) {
+        toast.error("Your review must be at least 10 characters long");
+        return;
+    }
+
+    if (reviewData.comment.trim().length > 1000) {
+        toast.error("Your review is too long. Please keep in under 1000 characters");
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/user/review",{
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                bookId: book?.id,
+                rating: reviewData.rating,
+                comment: reviewData.comment.trim(),
+            }),
+        });
+        if (response.ok) {
+            toast.success("Review Submitted! It will aappear after admin approval.");
+            setShowReviewForm(false);
+            setReviewData({ rating: 5, comment:""});
+            fetchBook();
+        } else {
+            const error = await response.json();
+            toast.error(error.error || "Failed to submit review");
+        }
+    } catch (error) {
+        console.error("Failed to submit review", error);
+    }
+   };
+
+
+
 
 
     const handleSignOut = async () => {
