@@ -406,8 +406,8 @@ if (loading || !book) {
         <p className="text-lg text-gray-600 mb-4">by {book.author}</p>
 
         <div className="flex items-center justify-between mb-4">
-        
-        <span className="text-sm text-gray-600">reviews reviews</span>
+        {renderStars(Math.round(book.averageRating))}
+        <span className="text-sm text-gray-600">{book._count.reviews} reviews</span>
         </div>
 
         <div className="space-y-3">
@@ -656,35 +656,35 @@ if (loading || !book) {
             </div>
         </form>
         )}
-        
+    {book.reviews.length === 0 ? (   
         <p className="text-gray-600 text-center py-8">
             No reviews yet. Be the first to review this book!
         </p>
-    
+     ): ( 
         <div className="space-y-6">
-            
-            <div  className="border-b border-gray-200 pb-6 last:border-0">
+        {book.reviews.map((review) => (   
+            <div key={review.id} className="border-b border-gray-200 pb-6 last:border-0">
                 <div className="flex items-start justify-between mb-2">
                 <div>
-                    <p className="font-semibold text-gray-900">fullName</p>
+                    <p className="font-semibold text-gray-900">{review.user.fullName}</p>
                     <div className="flex items-center space-x-2 mt-1">
-                    
-                    
+                    {renderStars(review.rating)}
+                    {review.isVerifiedPurchase && ( 
                         <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full font-semibold">
                         ✓ Verified Purchase
                         </span>
-                    
+                    )}
                     </div>
                 </div>
                 <span className="text-sm text-gray-500">
-                    createdAt
+                    {new Date(review.createdAt).toLocaleDateString()}
                 </span>
                 </div>
-                <p className="text-gray-700 leading-relaxed">reviewText</p>
+           <p className="text-gray-700 leading-relaxed">{review.reviewText}</p>
             </div>
-            
+            ))}  
         </div>
-    
+     )}
             </div>
           </div>
         </div>
