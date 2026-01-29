@@ -48,11 +48,56 @@ export async function POST(request: NextRequest){
    }
 
    /// Check if user alrady reviewd this book. 
+   const existingReview = await prisma.bookReview.findFirst({
+    where:{
+        userId: session.user.id,
+        bookId,
+    },
+   });
+   if (existingReview) {
+    return NextResponse.json(
+        { error: "You have already reviewd this book" },
+        {status: 400}
+    );
+   }
 
+   // Check if user has premium subscription (verified purchase)
+   const user = await prisma.user.findUnique({
+    where: {id: session.user.id},
+    select: { subscriptionTier: true },
+   });
 
+   const isVerifiedPurchase = user?.subscriptionTier !== "FREE";
 
+   // Create review for pending approval 
+   const review = await prisma.bookReview.create({
+    data: {
+        userId: session.user.id,
+        bookId,
+        rating,
+        reviewText: comment,
+        isApproved: false, // Reviews needed for admin approval 
+        isVerifiedPurchase,
+    },
+    include: {
+        user: {
+            select: {
+                id: true,
+                fullName: true,
+                email: true,
+            },
+        },
+        book: {
+            select: {
+                id: true,
+                title: true,
+            },
+        },
+    },
+   });
 
+   return NextResponse.json(review, { status: 201});
     } catch (error) {
-        
+        console.error("Error Creating review", error);
     }
 }
