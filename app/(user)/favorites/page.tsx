@@ -74,6 +74,28 @@ export default function FavoritesPage(){
     }
 
 
+    const handleRemoveFavorite = async (bookId: number) => {
+
+        if (!confirm("Remove this book form your favorites?")) {
+            return;
+        }
+
+    try {
+        const response = await fetch(`/api/user/favorites/${bookId}`, { method: "DELETE"});
+
+        if (response.ok) {
+            setFavorites(favorites.filter((fav) => fav.bookId !== bookId));
+            toast.success("Remvoe from favorites");
+        } else {
+            toast.error("Failed to remove favorites");
+        }
+    } catch (error) {
+        console.error("Failed to remove favorites", error);
+    }
+    
+    };
+
+
     const handleSignOut = async () => {
     try {
         const response = await fetch("/api/auth/signout",{
@@ -85,6 +107,19 @@ export default function FavoritesPage(){
     } catch (error) {
         console.error("Sign out error", error);
     }
+};
+
+const randerStars = (rating: number) => {
+    return (
+        <div className="flex items-center space-x-1">
+            {[...Array(5)].map((_,i) => (
+                <span key={i} className={i < Math.round(rating) ? "text-yellow-400" : "text-gray-300"}>
+                    ★
+                </span>
+            ))}
+        <span className="text-sm text-gray-600 ml-2">({rating.toFixed(1)})</span>
+        </div>
+    );
 };
 
 
@@ -195,7 +230,10 @@ export default function FavoritesPage(){
                 </div>
             )} 
             <button
-                
+              onClick={(e) => {
+                    e.preventDefault();
+                    handleRemoveFavorite(favorite.bookId);
+                }}  
                 className="absolute top-3 right-3 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
             >
                 <span className="text-xl">❤️</span>
@@ -228,7 +266,8 @@ export default function FavoritesPage(){
             <div className="flex items-center justify-between mb-3">
             
             <span className="text-xs text-gray-500">
-                reviews
+              {randerStars(favorite.book.averageRating)}
+                <span className="text-xs text-gray-500">{favorite.book._count.reviews}  reviews</span>
             </span>
             </div>
 
