@@ -250,6 +250,25 @@ export default function BookDetailsPage({ params }: { params: Promise<{ id: stri
     }
 };
 
+const renderStars = (rating: number, interactive = false, onRate?: (rating: number) => void) => {
+    return (
+        <div className="flex items-center space-x-1">
+            {[...Array(5)].map((_,i) => (
+             <button
+             key={i}
+             type="button"
+             onClick={() => interactive && onRate && onRate(i + 1)}
+             disabled={!interactive}
+             className={`${interactive ? "cursor-pointer hover:scale-110" : ""} ${i < rating ? "text-yellow-400" : "text-gray-300" } text-2xl`}
+             >
+                ★
+             </button>
+
+            ))}
+        </div>
+    );
+};
+
 if (loading || !book) {
     return (
         <div className="flex items-center justify-center min-h-screen">
@@ -263,7 +282,7 @@ if (loading || !book) {
    const chaptersWithAudio = chapters.filter(ch => ch.audioUrl);
    const currentChapter = chaptersWithAudio[currentChapterIndex];
    const isPremiumUser = user?.subscriptionTier !== "FREE";
-
+ 
     return (
          <div className="min-h-screen bg-gray-50">
       {/* Navigation Header */}
@@ -548,7 +567,8 @@ if (loading || !book) {
             <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Your Rating
             </label>
-            ddd
+            {renderStars(reviewData.rating, true, (rating) => setReviewData({ ...reviewData, rating})
+           )}
             </div>
 
             <div className="mb-4">
@@ -556,13 +576,20 @@ if (loading || !book) {
                 <label className="block text-sm font-semibold text-gray-700">
                 Your Review
                 </label>
-                <span className={`text-xs text-red-600`}>
-                (min: 10)
+                <span className={`text-xs ${
+                    reviewData.comment.length < 10
+                    ? "text-red-600"
+                    : reviewData.comment.length > 1000
+                    ? "text-red-600"
+                    : "text-gray-500"
+                } `}>
+                {reviewData.comment.length}/1000 Characters 
+                {reviewData.comment.length < 10 && "(min: 10)" } 
                 </span>
             </div>
             <textarea
-            
-            
+                value={reviewData.comment}
+                onChange={(e) => setReviewData({ ...reviewData, comment: e.target.value})}
                 required
                 rows={4}
                 maxLength={1000}
@@ -580,7 +607,7 @@ if (loading || !book) {
             </button>
             <button
                 type="button"
-                
+                onClick={() => setShowReviewForm(false)}
                 className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300"
             >
                 Cancel
