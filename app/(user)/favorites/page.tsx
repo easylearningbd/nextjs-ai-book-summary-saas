@@ -61,7 +61,7 @@ export default function FavoritesPage(){
             const response = await fetch("/api/user/favorites");
             if (response.ok) {
                 const data = await response.json();
-               // console.log("favorites data:", data);
+                 console.log("favorites data:", data);
                 setFavorites(data);
             } else if (response.status === 401){
                 router.push("/login");
@@ -149,16 +149,16 @@ export default function FavoritesPage(){
 <div className="mb-8">
     <h1 className="text-4xl font-bold text-gray-900 mb-2">My Favorites</h1>
     <p className="text-gray-600">
-    saved
+     {loading ? "Loading.." : `${favorites.length} book${favorites.length !== 1 ? "s" : ""} saved `} 
     </p>
 </div>
 
 {/* Favorites Grid */}
-
+    {loading ? ( 
     <div className="flex items-center justify-center py-20">
     <div className="text-xl text-gray-600">Loading your favorites...</div>
     </div>
-
+    ) : favorites.length === 0 ? ( 
     <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
     <div className="text-6xl mb-4">❤️</div>
     <h3 className="text-2xl font-bold text-gray-900 mb-2">No favorites yet</h3>
@@ -172,27 +172,28 @@ export default function FavoritesPage(){
         Browse Books
     </Link>
     </div>
-
+    ) :  ( 
+   
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        
+       {favorites.map((favorite) => ( 
         <div
-        
+        key={favorite.id}
         className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
         >
-        <Link href={`/books/id`}>
+        <Link href={`/books/${favorite.book.id}`}>
             <div className="relative h-64 bg-gray-100">
-            
+            {favorite.book.coverImageUrl ? (
                 <Image
-                src=""
-                alt="{favorite.book.title}"
+                src={favorite.book.coverImageUrl}
+                alt={favorite.book.title}
                 fill
                 className="object-cover"
                 />
-                
+               ): ( 
                 <div className="flex items-center justify-center h-full text-gray-400">
                 <span className="text-6xl">📖</span>
                 </div>
-            
+            )} 
             <button
                 
                 className="absolute top-3 right-3 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
@@ -205,23 +206,23 @@ export default function FavoritesPage(){
         <div className="p-4">
             <div className="mb-2">
             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">
-                
-                <span className="mr-1">icon</span>
-            
-                category.name
+                {favorite.book.category.icon && ( 
+                <span className="mr-1">{favorite.book.category.icon}</span>
+            )}
+                {favorite.book.category.name}
             </span>
             </div>
 
             <Link href={`/books/id`}>
             <h3 className="text-lg font-bold text-gray-900 mb-1 line-clamp-2 hover:text-indigo-600">
-                title
+                {favorite.book.title}
             </h3>
             </Link>
 
-            <p className="text-sm text-gray-600 mb-2">by author</p>
+            <p className="text-sm text-gray-600 mb-2">by {favorite.book.author}</p>
 
             <p className="text-sm text-gray-700 mb-3 line-clamp-2">
-            description
+            {favorite.book.description}
             </p>
 
             <div className="flex items-center justify-between mb-3">
@@ -232,16 +233,16 @@ export default function FavoritesPage(){
             </div>
 
             <Link
-            href={`/books/id`}
+            href={`/books/${favorite.book.id}`}
             className="block w-full py-2 bg-indigo-600 text-white rounded-lg font-semibold text-center hover:bg-indigo-700 transition-colors"
             >
             Read Summary
             </Link>
         </div>
         </div>
-    
+    ))} 
     </div>
-
+ )}
 </div>
 </div>
     );
