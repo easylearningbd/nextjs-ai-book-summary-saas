@@ -19,14 +19,38 @@ export async function PUT(
             return NextResponse.json({ error: "Unauthorized"}, { status: 401});
         } 
 
+    const { id } = await params;
+    const body = await request.json();
 
-
-    } catch (error) {
-        
+    // Validation request from body 
+    const validation = reviewUpdateSchema.safeParse(body);
+    if (!validation.success) {
+        return NextResponse.json(
+            {error: "Invalid request data"},
+            { status: 400 }
+        );
     }
 
+    const data = validation.data;
 
+    // Check if review exists 
+    const existingReview = await prisma.bookReview.findUnique({
+        where: {id: parseInt(id)},
+    });
 
+    if (!existingReview) {
+        return NextResponse.json({ error: "Review not found" }, {status: 404});
+    }
 
-
+    /// Update review 
+    const review = await prisma.bookReview.update({
+        where: {id: parseInt(id)},
+        data: {
+            isApproved: data.isApproved,
+        },
+    });
+    return NextResponse.json(review);
+    } catch (error) {
+        console.error("error pdating reveiw", error);
+    }
 }
