@@ -31,6 +31,25 @@ export default function ReviewsPage(){
     const [filter, setFilter] = useState("all");
     const [updating, setUpdating] = useState<number | null>(null);
 
+   useEffect(() => {
+    fetchReviews();
+   },[]);
+    
+   
+    async function fetchReviews(){
+        try {
+            const response = await fetch("/api/admin/reviews");
+            if (response.ok) {
+                const data = await response.json();
+                console.log("review all data", data);
+                setReviews(data);
+            }
+            setLoading(false);
+        } catch (error) {
+            console.error("Failed to fetch reviews", error);
+             setLoading(false);
+        }
+    }
 
 
     return (
