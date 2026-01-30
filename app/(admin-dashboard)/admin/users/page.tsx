@@ -33,6 +33,7 @@ export default function UsersPage(){
             const response = await fetch("/api/admin/users");
             if (response.ok) {
                 const data = await response.json();
+                console.log("all user data:", data);
                 setUsers(data);
             }
             setLoading(false);
