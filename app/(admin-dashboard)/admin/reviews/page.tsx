@@ -64,6 +64,7 @@ export default function ReviewsPage(){
                 body: JSON.stringify({ isApproved: !currentStatus }),
             });
             if (response.ok) {
+                toast.success("Reveiw Updated successfully!");
                 fetchReviews();
             }else {
                 toast.error("Failed to update review");
@@ -73,6 +74,31 @@ export default function ReviewsPage(){
         } finally {
             setUpdating(null);
         }
+    }
+
+
+    async function handleDelete(reviewId: number) {
+        if (!confirm("Are you sure you want to delete this review?")) {
+            return;
+        }
+         setUpdating(reviewId);
+
+         try {
+            const response = await fetch(`/api/admin/reviews/${reviewId}`,{
+                method: "DELETE", 
+            });
+            if (response.ok) {
+                toast.success("Reveiw deleted successfully!");
+                fetchReviews();
+            }else {
+                toast.error("Failed to deleting review");
+            }
+        } catch (error) {
+            toast.error("An error occurred while deleting the review");
+        } finally {
+            setUpdating(null);
+        } 
+
     }
 
 
@@ -285,8 +311,8 @@ export default function ReviewsPage(){
         } 
     </button>
             <button
-                
-                
+                onClick={() => handleDelete(review.id)}
+                disabled={updating === review.id}
                 className="px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-semibold hover:bg-red-200 disabled:opacity-50"
             >
                 Delete
