@@ -185,65 +185,81 @@ export default function ReviewsPage(){
             <p className="text-sm text-gray-600"> {review.book.author}</p>
             </div>
             <div className="flex items-center space-x-1">
-                
+                {[...Array(5)].map((_,i) => (
+                              
                 <span
-                
-                    className={`text-xl text-yellow-400`}
+                key={i}
+                    className={`text-xl ${
+                        i < review.rating ? "text-yellow-400" : "text-gray-300"} `}
                 >
                     ★
                 </span>
-                
+                 ))}
             </div>
             </div>
 
             {/* Review Title */}
-        
-            <h3 className="font-semibold text-gray-900 mb-2">reviewTitle</h3>
-            
+      {review.reviewTitle && ( 
+      <h3 className="font-semibold text-gray-900 mb-2">{review.reviewTitle}</h3>
+        )} 
 
             {/* Review Text */}
-            
-            <p className="text-gray-700 mb-3">reviewText</p>
-            
+            {review.reviewText && ( 
+            <p className="text-gray-700 mb-3">{review.reviewText}</p>
+              )} 
 
             {/* Review Meta */}
             <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
             <Link
-                href={`/admin/users/id`}
+                href={`/admin/users/${review.user.id}`}
                 className="hover:text-indigo-600 font-medium"
             >
-            fullName
+            {review.user.fullName}
             </Link>
             <span>•</span>
-            <span>createdAt</span>
-            
+            <span>{new Date(review.createdAt).toLocaleDateString()}</span>
+            {review.isVerifiedPurchase && (
                 <>
                 <span>•</span>
                 <span className="text-green-600 font-medium">✓ Verified Purchase</span>
                 </>
-            
+             )}
             <span>•</span>
-            <span>  found helpful</span>
+            <span> {review.helpfulCount} found helpful</span>
             </div>
 
             {/* Status Badges */}
             <div className="flex items-center space-x-2 mb-3">
             <span
-                className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700`}
+                className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
+                    review.isApproved
+                    ? "bg-green-100 text-green-700"
+                    : "bg-orange-100 text-orange-700"
+                } `}
             >
-                Pending Approval
+              {review.isApproved ? "Approved" : "Pending Approval"}  
             </span>
             </div>
 
             {/* Actions */}
-            <div className="flex items-center space-x-3">
-            <button
-                
-                
-                className={`px-4 py-2 rounded-lg text-sm font-semibold bg-orange-100 text-orange-700 disabled:opacity-50`}
-            >
-                Approve
-            </button>
+    <div className="flex items-center space-x-3">
+    <button
+        
+        
+        className={`px-4 py-2 rounded-lg text-sm font-semibold
+            ${
+                review.isApproved
+                ? "bg-orange-100 text-orange-700 disabled:opacity-50"
+                : "bg-green-100 text-green-700 hover:bg-green-200"
+            } disabled:opacity-50`}
+    >
+        {updating === review.id 
+        ? "Updating..."
+        : review.isApproved
+        ? "Unapprove"
+        : "Approve"
+        } 
+    </button>
             <button
                 
                 
