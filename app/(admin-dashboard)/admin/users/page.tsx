@@ -196,75 +196,81 @@ export default function UsersPage(){
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
-            
-                <tr>
-                  <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
-                    No users found.
-                  </td>
-                </tr>
-            
-                  <tr  className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="w-10 h-10 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                          
-                        </div>
-                        <div className="ml-3">
-                          <div className="font-semibold text-gray-900">fullName</div>
-                           
-                            <span className="text-xs text-green-600">✓ Verified</span>
-                           
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">email</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700`}
-                      >
-                        role
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold  `}
-                      >
-                      subscriptionTier
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold $ `}
-                      >
-                      subscriptionStatus
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-xs text-gray-600">
-                        <div>  favorites</div>
-                        <div>  reviews</div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">
-                       createdAt
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Link
-                        href={`/admin/users/id`}
-                        className="text-indigo-600 hover:text-indigo-900 font-semibold text-sm"
-                      >
-                        View Details
-                      </Link>
-                    </td>
-                  </tr>
-                
-              
-            </tbody>
+<tbody className="divide-y divide-gray-200">
+{filteredUsers.length === 0 ? ( 
+    <tr>
+        <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
+        No users found.
+        </td>
+    </tr>
+) : (   
+     filteredUsers.map((user) => ( 
+        <tr key={user.id} className="hover:bg-gray-50">
+        <td className="px-6 py-4 whitespace-nowrap">
+            <div className="flex items-center">
+            <div className="w-10 h-10 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+              {user.fullName.charAt(0).toUpperCase()}  
+            </div>
+            <div className="ml-3">
+        <div className="font-semibold text-gray-900">{user.fullName}</div>
+        {user.emailVerified && (       
+        <span className="text-xs text-green-600">✓ Verified</span>
+         )}         
+            </div>
+            </div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+            <div className="text-sm text-gray-600">{user.email}</div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+            <span
+            className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                user.role === "ADMIN"
+                ? "bg-red-100 text-red-700"
+                : "bg-blue-100 text-blue-700"
+            } `}
+            >
+            {user.role}
+            </span>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+            <span
+            className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${getTierBadgeColor(user.subscriptionTier)} `}
+            >
+            {user.subscriptionTier}
+            </span>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+            <span
+            className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold $ ${getStatusBadgeColor(user.subscriptionStatus)}`}
+            >
+            {user.subscriptionStatus}
+            </span>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+            <div className="text-xs text-gray-600">
+            <div>{user._count?.favorites || 0}  favorites</div>
+            <div>{user._count?.reviews || 0}  reviews</div>
+            </div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+            <div className="text-sm text-gray-600">
+            { new Date(user.createdAt).toLocaleDateString() }
+            </div>
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap">
+            <Link
+            href={`/admin/users/id`}
+            className="text-indigo-600 hover:text-indigo-900 font-semibold text-sm"
+            >
+            View Details
+            </Link>
+        </td>
+        </tr>
+        ))
+     )}
+    
+</tbody>
           </table>
         </div>
       </div>
