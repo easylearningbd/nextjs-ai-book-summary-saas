@@ -41,7 +41,7 @@ export default function ReviewsPage(){
             const response = await fetch("/api/admin/reviews");
             if (response.ok) {
                 const data = await response.json();
-                console.log("review all data", data);
+               // console.log("review all data", data);
                 setReviews(data);
             }
             setLoading(false);
@@ -49,6 +49,27 @@ export default function ReviewsPage(){
             console.error("Failed to fetch reviews", error);
              setLoading(false);
         }
+    }
+
+
+    const filteredReviews = reviews.filter((review) => {
+        if(filter === "all") return true;
+        if(filter === "approved") return review.isApproved;
+        if(filter === "pending") return !review.isApproved;
+        if(filter === "verified") return review.isVerifiedPurchase;
+        return true;
+    });
+
+    const averageRating = reviews.length > 0 
+    ? (reviews.reduce((sum, r) => sum  + r.rating, 0) / reviews.length).toFixed(1)
+    : 0;
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-xl">Loading...</div>
+            </div>
+        )
     }
 
 
@@ -64,22 +85,22 @@ export default function ReviewsPage(){
       <div className="mb-6 grid grid-cols-4 gap-6">
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Total Reviews</div>
-          <div className="text-3xl font-bold text-gray-900">length</div>
+     <div className="text-3xl font-bold text-gray-900">{reviews.length}</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Average Rating</div>
-          <div className="text-3xl font-bold text-yellow-600">averageRating ★</div>
+          <div className="text-3xl font-bold text-yellow-600">{averageRating} ★</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Approved</div>
           <div className="text-3xl font-bold text-green-600">
-           Approved
+          {reviews.filter((r) => r.isApproved).length}
           </div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Pending</div>
           <div className="text-3xl font-bold text-orange-600">
-            Pending
+            {reviews.filter((r) => !r.isApproved).length}
           </div>
         </div>
       </div>
@@ -88,138 +109,155 @@ export default function ReviewsPage(){
       <div className="mb-6 flex items-center space-x-3">
         <span className="text-sm font-medium text-gray-700">Filter:</span>
         <button
-          
-          className={`px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 text-white`}
+          onClick={() =>  setFilter("all")}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold
+            ${filter === "all"
+                ? "bg-indigo-600 text-white"
+                : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+            } `}
         >
           All Reviews
         </button>
         <button
-         
-          className={`px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 text-white`}
+          onClick={() =>  setFilter("approved")}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold
+            ${filter === "approved"
+                ? "bg-indigo-600 text-white"
+                : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+            } `}
         >
           Approved
         </button>
         <button
-          
-          className={`px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 text-white`}
+          onClick={() =>  setFilter("pending")}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold
+            ${filter === "pending"
+                ? "bg-indigo-600 text-white"
+                : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+            } `}
         >
           Pending
         </button>
         <button
-          
-          className={`px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 text-white`}
+          onClick={() =>  setFilter("verified")}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold
+            ${filter === "verified"
+                ? "bg-indigo-600 text-white"
+                : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+            } `}
         >
           Verified Purchase
         </button>
       </div>
 
       {/* Reviews List */}
-      <div className="space-y-4">
-          
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
-            <p className="text-gray-500">No reviews found.</p>
-          </div>
-        
-           
-            <div
-            
-              className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start space-x-4">
-                {/* Book Cover */}
-               
-                  <img
-                    src=""
-                    alt=""
-                    className="w-20 h-28 object-cover rounded-lg"
-                  />
-                
+<div className="space-y-4">
+    {filteredReviews.length === 0 ? ( 
+    <div className="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
+    <p className="text-gray-500">No reviews found.</p>
+    </div>
+) : (  
+    filteredReviews.map((review) => ( 
+    <div
+        key={review.id}
+        className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow"
+    >
+        <div className="flex items-start space-x-4">
+        {/* Book Cover */}
+        {review.book.coverImageUrl && ( 
+            <img
+            src={review.book.coverImageUrl}
+            alt={review.book.title}
+            className="w-20 h-28 object-cover rounded-lg"
+            /> 
+            )}
 
-                {/* Review Content */}
-                <div className="flex-1">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <Link
-                        href={`/admin/books/id/details`}
-                        className="text-lg font-bold text-gray-900 hover:text-indigo-600"
-                      >
-                     title
-                      </Link>
-                      <p className="text-sm text-gray-600">author</p>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                       
-                        <span
-                        
-                          className={`text-xl text-yellow-400`}
-                        >
-                          ★
-                        </span>
-                      
-                    </div>
-                  </div>
-
-                  {/* Review Title */}
-                
-                    <h3 className="font-semibold text-gray-900 mb-2">reviewTitle</h3>
-                  
-
-                  {/* Review Text */}
-                 
-                    <p className="text-gray-700 mb-3">reviewText</p>
-                  
-
-                  {/* Review Meta */}
-                  <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
-                    <Link
-                      href={`/admin/users/id`}
-                      className="hover:text-indigo-600 font-medium"
-                    >
-                    fullName
-                    </Link>
-                    <span>•</span>
-                    <span>createdAt</span>
-                    
-                      <>
-                        <span>•</span>
-                        <span className="text-green-600 font-medium">✓ Verified Purchase</span>
-                      </>
-                   
-                    <span>•</span>
-                    <span>  found helpful</span>
-                  </div>
-
-                  {/* Status Badges */}
-                  <div className="flex items-center space-x-2 mb-3">
-                    <span
-                      className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700`}
-                    >
-                     Pending Approval
-                    </span>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center space-x-3">
-                    <button
-                      
-                     
-                      className={`px-4 py-2 rounded-lg text-sm font-semibold bg-orange-100 text-orange-700 disabled:opacity-50`}
-                    >
-                     Approve
-                    </button>
-                    <button
-                      
-                       
-                      className="px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-semibold hover:bg-red-200 disabled:opacity-50"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
+        {/* Review Content */}
+        <div className="flex-1">
+            <div className="flex items-start justify-between mb-3">
+            <div>
+                <Link
+                href={`/admin/books/${review.book.id}/details`}
+                className="text-lg font-bold text-gray-900 hover:text-indigo-600"
+                >
+                {review.book.title}
+                </Link>
+            <p className="text-sm text-gray-600"> {review.book.author}</p>
             </div>
-          
-       
+            <div className="flex items-center space-x-1">
+                
+                <span
+                
+                    className={`text-xl text-yellow-400`}
+                >
+                    ★
+                </span>
+                
+            </div>
+            </div>
+
+            {/* Review Title */}
+        
+            <h3 className="font-semibold text-gray-900 mb-2">reviewTitle</h3>
+            
+
+            {/* Review Text */}
+            
+            <p className="text-gray-700 mb-3">reviewText</p>
+            
+
+            {/* Review Meta */}
+            <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+            <Link
+                href={`/admin/users/id`}
+                className="hover:text-indigo-600 font-medium"
+            >
+            fullName
+            </Link>
+            <span>•</span>
+            <span>createdAt</span>
+            
+                <>
+                <span>•</span>
+                <span className="text-green-600 font-medium">✓ Verified Purchase</span>
+                </>
+            
+            <span>•</span>
+            <span>  found helpful</span>
+            </div>
+
+            {/* Status Badges */}
+            <div className="flex items-center space-x-2 mb-3">
+            <span
+                className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700`}
+            >
+                Pending Approval
+            </span>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center space-x-3">
+            <button
+                
+                
+                className={`px-4 py-2 rounded-lg text-sm font-semibold bg-orange-100 text-orange-700 disabled:opacity-50`}
+            >
+                Approve
+            </button>
+            <button
+                
+                
+                className="px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-semibold hover:bg-red-200 disabled:opacity-50"
+            >
+                Delete
+            </button>
+            </div>
+        </div>
+        </div>
+    </div>
+    ))
+    )}
+
       </div>
     </div>
     );
