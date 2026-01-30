@@ -52,6 +52,30 @@ export default function ReviewsPage(){
     }
 
 
+    async function handleToggleApproval(reviewId: number, currentStatus: boolean){
+        setUpdating(reviewId);
+
+        try {
+            const response = await fetch(`/api/admin/reviews/${reviewId}`,{
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ isApproved: !currentStatus }),
+            });
+            if (response.ok) {
+                fetchReviews();
+            }else {
+                toast.error("Failed to update review");
+            }
+        } catch (error) {
+            toast.error("An error occurred while updating the review");
+        } finally {
+            setUpdating(null);
+        }
+    }
+
+
     const filteredReviews = reviews.filter((review) => {
         if(filter === "all") return true;
         if(filter === "approved") return review.isApproved;
@@ -244,8 +268,8 @@ export default function ReviewsPage(){
             {/* Actions */}
     <div className="flex items-center space-x-3">
     <button
-        
-        
+        onClick={() => handleToggleApproval(review.id, review.isApproved)}
+        disabled={updating === review.id}
         className={`px-4 py-2 rounded-lg text-sm font-semibold
             ${
                 review.isApproved
