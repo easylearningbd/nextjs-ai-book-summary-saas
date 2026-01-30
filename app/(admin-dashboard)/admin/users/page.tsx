@@ -33,7 +33,7 @@ export default function UsersPage(){
             const response = await fetch("/api/admin/users");
             if (response.ok) {
                 const data = await response.json();
-                console.log("all user data:", data);
+               // console.log("all user data:", data);
                 setUsers(data);
             }
             setLoading(false);
@@ -43,7 +43,47 @@ export default function UsersPage(){
         }
     }
 
+     const filteredUsers = users.filter((user) => {
+        if(filter === "all") return true;
+        if(filter === "admin") return user.role === "ADMIN";
+        if(filter === "premium") return user.subscriptionTier !== "FREE";
+        if(filter === "free") return user.subscriptionTier === "FREE";
+        return true;
+    });
 
+    const getTierBadgeColor = (tier: string) => {
+        switch (tier) {
+            case "LIFETIME":
+                return "bg-purple-100 text-purple-700";
+            case "YEARLY":
+                return "bg-blue-100 text-blue-700";  
+            case "YEARLY":
+                return "bg-green-100 text-green-700";
+            default:
+              return "bg-gray-100 text-gray-700";
+        }
+    };
+
+    const getStatusBadgeColor = (status: string) => {
+        switch (status) {
+            case "ACTIVE":
+                return "bg-green-100 text-green-700";
+            case "CANCELLED":
+                return "bg-yellow-100 text-yellow-700";  
+            case "EXPIRED":
+                return "bg-red-100 text-red-700";
+            default:
+              return "bg-gray-100 text-gray-700";
+        }
+    };
+
+ if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-xl">Loading...</div>
+            </div>
+        )
+    } 
 
     return (
          <div>
@@ -57,24 +97,24 @@ export default function UsersPage(){
       <div className="mb-6 grid grid-cols-4 gap-6">
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Total Users</div>
-          <div className="text-3xl font-bold text-gray-900">length</div>
+      <div className="text-3xl font-bold text-gray-900">{users.length}</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Premium Users</div>
           <div className="text-3xl font-bold text-indigo-600">
-           Users
+           {users.filter((u) => u.subscriptionTier !== "FREE").length}
           </div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Free Users</div>
           <div className="text-3xl font-bold text-gray-600">
-            Users
+             {users.filter((u) => u.subscriptionTier === "FREE").length}
           </div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Verified Emails</div>
           <div className="text-3xl font-bold text-green-600">
-          Users
+          {users.filter((u) => u.emailVerified).length}
           </div>
         </div>
       </div>
@@ -83,26 +123,42 @@ export default function UsersPage(){
       <div className="mb-6 flex items-center space-x-3">
         <span className="text-sm font-medium text-gray-700">Filter:</span>
         <button
-          
-          className={`px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 text-white`}
+          onClick={() => setFilter("all")}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+            filter === "all"
+            ? "bg-indigo-600 text-white"
+            : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+          } `}
         >
           All Users
         </button>
         <button
-          
-          className={`px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 text-white`}
+          onClick={() => setFilter("premium")}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+            filter === "premium"
+            ? "bg-indigo-600 text-white"
+            : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+          } `}
         >
           Premium
         </button>
         <button
-          
-          className={`px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 text-white`}
+          onClick={() => setFilter("free")}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+            filter === "free"
+            ? "bg-indigo-600 text-white"
+            : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+          } `}
         >
           Free
         </button>
         <button
-          
-          className={`px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 text-white`}
+          onClick={() => setFilter("admin")}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+            filter === "admin"
+            ? "bg-indigo-600 text-white"
+            : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+          } `}
         >
           Admins
         </button>
