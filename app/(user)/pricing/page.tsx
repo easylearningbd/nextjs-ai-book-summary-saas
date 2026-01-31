@@ -21,6 +21,56 @@ export default function PricingPage(){
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<any>(null);
 
+    useEffect(() => {
+        fetchSession();
+    },[]);
+
+async function fetchSession(){
+    try {
+        const sessionResponse = await fetch("/api/auth/session");
+        if (sessionResponse.ok) {
+            const sessionData = await sessionResponse.json();
+            if (sessionData) {
+                const profileResponse = await fetch("/api/user/profile");
+                if (profileResponse.ok) {
+                    const userData = await profileResponse.json();
+                    console.log("User data", userData);
+                    setUser(userData);
+                    setSession({
+                        ...sessionData,
+                        user: {
+                        ...sessionData.user,
+                        subscriptionTier: userData.subscriptionTier,
+                        subscriptionStatus: userData.subscriptionStatus,
+                        },                        
+                    });
+                } else {
+                    setSession(sessionData);
+                }
+            } else {
+                 setSession(sessionData);
+            }
+        }
+        setLoading(false);
+    } catch (error) {
+        console.error("Failed to fetch session:", error);
+        setLoading(false);
+    }
+}
+
+
+ const handleSignOut = async () => {
+    try {
+        const response = await fetch("/api/auth/signout",{
+            method: "POST"
+        });
+        if (response.ok) {
+            window.location.href = "/";
+        }
+    } catch (error) {
+        console.error("Sign out error", error);
+    }
+};
 
 
     return (
@@ -37,46 +87,42 @@ export default function PricingPage(){
         <span className="text-xl font-bold text-gray-900">BookWise</span>
         </Link>
         <div className="hidden md:flex items-center space-x-6">
-        
-            <>
-            <Link href="/dashboard" className="text-gray-600 hover:text-gray-900 font-medium">
-                Dashboard
-            </Link>
-            <Link href="/books" className="text-gray-600 hover:text-gray-900 font-medium">
-                Browse Books
-            </Link>
-            <Link href="/favorites" className="text-gray-600 hover:text-gray-900 font-medium">
-                My Favorites
-            </Link>
-            </>
-        
-        <Link href="/pricing" className="text-indigo-600 font-semibold hover:text-indigo-700">
+        <Link href="/dashboard" className="text-gray-600 hover:text-gray-900 font-medium">
+            Dashboard
+        </Link>
+        <Link href="/books" className="text-gray-600 font-semibold hover:text-indigo-700">
+            Browse Books
+        </Link>
+        <Link href="/favorites" className="text-gray-600 hover:text-gray-900 font-medium">
+            My Favorites
+        </Link>
+        <Link href="/pricing" className="text-indigo-600 hover:text-gray-900 font-medium">
             Pricing
         </Link>
         </div>
     </div>
     <div className="flex items-center space-x-4">
-        
+     {user ? (
         <>
             <div className="hidden md:block text-right">
-            <p className="text-sm font-medium text-gray-900">fullName</p>
-            <p className="text-xs text-gray-600">subscriptionTier</p>
+            <p className="text-sm font-medium text-gray-900">{user.fullName}</p>
+            <p className="text-xs text-gray-600">{user.subscriptionTier}</p>
             </div>
             <button
-            
+            onClick={handleSignOut}
             className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
             Sign Out
             </button>
         </>
-        
+         ) : ( 
         <Link
             href="/login"
             className="px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
         >
             Sign In
         </Link>
-        
+       )}
     </div>
     </div>
 </div>
