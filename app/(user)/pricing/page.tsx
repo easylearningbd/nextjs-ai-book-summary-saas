@@ -163,6 +163,29 @@ async function fetchSession(){
 
   const handleSelectPlan = (planType: string) => {
 
+    if (!session) {
+        router.push("/login?redirect=/pricing");
+        return;
+    }
+
+    if (planType === "FREE") {
+        return;
+    }
+
+    // Check fi user alrady has thsi plan or better 
+    if (session.user.subscriptionTier === planType && session.user.subscriptionStatus === "ACTIVE") {
+        toast.error("You already have this plan active");
+        return;
+    }
+
+    if (session.user.subscriptionTier === "LIFETIME") {
+        toast.error("You already have lifetime access!");
+        return;
+    }
+
+    // Redireact to payment page 
+    router.push(`/pricing/checkout?plan=${planType}`);
+    
   }
 
 
