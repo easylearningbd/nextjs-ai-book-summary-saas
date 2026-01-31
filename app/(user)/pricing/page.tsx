@@ -73,6 +73,95 @@ async function fetchSession(){
 };
 
 
+ const plans = [
+    {
+      name: "Free",
+      price: "$0",
+      period: "forever",
+      type: "FREE",
+      description: "Perfect for exploring BookWise",
+      features: [
+        "Browse all books catalog",
+        "Read book descriptions",
+        "View table of contents",
+        "Listen to ONLY 10 seconds of audio",
+        "Add reviews and ratings",
+        "Limited access",
+      ],
+      limitations: [
+        "Cannot listen to full audio",
+        "Cannot download PDFs",
+        "No favorites feature",
+      ],
+      buttonText: "Current Plan",
+      popular: false,
+      disabled: true,
+    },
+    {
+      name: "Monthly",
+      price: "$9.99",
+      period: "per month",
+      type: "MONTHLY",
+      description: "Full access with monthly flexibility",
+      features: [
+        "Full access to 10,000+ book summaries",
+        "Read complete summaries online",
+        "Listen to full audio summaries",
+        "Download PDFs",
+        "Add books to favorites",
+        "Unlimited access",
+        "Cancel anytime",
+      ],
+      buttonText: "Get Started",
+      popular: false,
+      disabled: false,
+    },
+    {
+      name: "Yearly",
+      price: "$60",
+      period: "per year",
+      type: "YEARLY",
+      savings: "Save $59.88 vs Monthly",
+      description: "Best value for serious learners",
+      pricePerMonth: "$5.00/mo",
+      features: [
+        "Full access to 10,000+ book summaries",
+        "Read complete summaries online",
+        "Listen to full audio summaries",
+        "Download PDFs",
+        "Add books to favorites",
+        "Unlimited access",
+        "Priority support",
+      ],
+      buttonText: "Get Started",
+      popular: true,
+      disabled: false,
+    },
+    {
+      name: "Lifetime",
+      price: "$129.99",
+      period: "one-time payment",
+      type: "LIFETIME",
+      savings: "Best long-term value",
+      description: "Pay once, access forever",
+      features: [
+        "Full access to 10,000+ book summaries",
+        "Read complete summaries online",
+        "Listen to full audio summaries",
+        "Download PDFs",
+        "Add books to favorites",
+        "Unlimited access",
+        "Lifetime updates",
+        "VIP support",
+        "All future features included",
+      ],
+      buttonText: "Get Lifetime Access",
+      popular: false,
+      disabled: false,
+    },
+  ];
+
+
     return (
          <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       {/* Navigation Header */}
@@ -140,51 +229,57 @@ async function fetchSession(){
 </div>
 
 {/* Current Plan Banner */}
-
+ {session && session.user.subscriptionTier !== "FREE" && (
     <div className="mb-12 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 text-white text-center">
     <p className="text-lg">
-        Your current plan: <strong>subscriptionTier</strong> subscriptionStatus
+        Your current plan: <strong>{session.user.subscriptionTier}</strong> ({session.user.subscriptionStatus})
     </p>
     </div>
-
+)}
 
 {/* Plans Grid */}
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-    
+    {plans.map((plan) => ( 
     <div
-        
-        className={`relative bg-white rounded-2xl shadow-xl border-2 transition-all hover:shadow-2xl border-indigo-600 scale-105`}
+        key={plan.type}
+        className={`relative bg-white rounded-2xl shadow-xl border-2 transition-all hover:shadow-2xl ${
+            plan.popular 
+            ? "border-indigo-600 scale-105"
+            : "border-gray-200"
+        } `}
     >
-        
+        {plan.popular && ( 
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
             <span className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-1 rounded-full text-sm font-semibold">
             Most Popular
             </span>
         </div>
-        
+        )}
 
         <div className="p-8">
         <h3 className="text-2xl font-bold text-gray-900 mb-2">
-        name
+        {plan.name}
         </h3>
-        <p className="text-gray-600 text-sm mb-6">description</p>
+        <p className="text-gray-600 text-sm mb-6">{plan.description}</p>
 
         <div className="mb-6">
             <div className="flex items-baseline">
             <span className="text-5xl font-bold text-gray-900">
-                price
+               {plan.price}
             </span>
             </div>
-            <p className="text-gray-600 text-sm mt-1">period</p>
-            
+            <p className="text-gray-600 text-sm mt-1">{plan.period}</p>
+            {plan.pricePerMonth && ( 
             <p className="text-indigo-600 font-semibold mt-1">
-            pricePerMonth
+            {plan.pricePerMonth}
             </p>
+            )}
             
-            
+            {plan.savings && ( 
             <p className="text-green-600 font-semibold text-sm mt-1">
-            savings
+            {plan.savings}
             </p>
+             )}
             
         </div>
 
@@ -238,7 +333,7 @@ async function fetchSession(){
         </ul>
         </div>
     </div>
-    
+    ))}
 </div>
 
 {/* FAQ Section */}
