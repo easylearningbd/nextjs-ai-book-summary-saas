@@ -161,6 +161,10 @@ async function fetchSession(){
     },
   ];
 
+  const handleSelectPlan = (planType: string) => {
+
+  }
+
 
     return (
          <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
@@ -284,16 +288,26 @@ async function fetchSession(){
         </div>
 
         <button
-            
-            
-            className={`w-full py-3 rounded-lg font-semibold mb-6 transition-all bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-lg`}
+            onClick={() => handleSelectPlan(plan.type)}
+            disabled={plan.disabled ||  (session?.user.subscriptionTier === plan.type && session?.user.subscriptionStatus === "ACTIVE")}            
+            className={`w-full py-3 rounded-lg font-semibold mb-6 transition-all ${
+                plan.popular
+                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-lg"
+                : plan.disabled
+                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                : "bg-gray-900 text-white hover:bg-gray-800"
+            } `}
         >
+            { session?.user.subscriptionTier === plan.type && session?.user.subscriptionStatus === "ACTIVE"
+            ? "Current Plan"
+            : plan.buttonText
+            }
             
         </button>
 
         <ul className="space-y-3">
-            
-            <li   className="flex items-start">
+            {plan.features.map((feature, index) => ( 
+            <li key={index}   className="flex items-start">
                 <svg
                 className="w-5 h-5 text-green-600 mt-0.5 mr-3 flex-shrink-0"
                 fill="none"
@@ -307,11 +321,12 @@ async function fetchSession(){
                     d="M5 13l4 4L19 7"
                 />
                 </svg>
-                <span className="text-gray-700 text-sm">feature</span>
+                <span className="text-gray-700 text-sm">{feature}</span>
             </li>
-            
-            
-                <li   className="flex items-start">
+            ))}
+            {plan.limitations &&             
+                plan.limitations.map((limitation, index) => ( 
+                <li key={index}  className="flex items-start">
                 <svg
                     className="w-5 h-5 text-red-500 mt-0.5 mr-3 flex-shrink-0"
                     fill="none"
@@ -326,10 +341,10 @@ async function fetchSession(){
                     />
                 </svg>
                 <span className="text-gray-500 text-sm">
-                    limitation
+                    {limitation}
                 </span>
                 </li>
-            
+            ))}
         </ul>
         </div>
     </div>
