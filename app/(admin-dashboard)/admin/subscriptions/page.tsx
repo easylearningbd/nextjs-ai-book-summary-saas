@@ -45,7 +45,7 @@ export default function SubscriptionPage(){
             const response = await fetch(`/api/admin/subscription-orders?status=${filter}`);
             if (response.ok) {
                 const data = await response.json();
-                console.log("order data", data);
+                //console.log("order data", data);
                 setOrders(data);
             }
             setLoading(false);
@@ -55,6 +55,28 @@ export default function SubscriptionPage(){
     }
 
 
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case "PENDING":
+                return "bg-yellow-100 text-yellow-700";
+            case "APPROVED":
+                return "bg-green-100 text-green-700";
+            case "REJECTED":
+                return "bg-red-100 text-red-700";
+            case "CANCELLED":
+                return "bg-gray-100 text-gray-700";         
+            default:
+                return "bg-gray-100 text-gray-700";        
+        }
+    }
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-xl">Loading....</div>
+            </div>
+        );
+    }
 
 
 
@@ -70,24 +92,24 @@ export default function SubscriptionPage(){
       <div className="mb-6 grid grid-cols-4 gap-6">
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Total Orders</div>
-          <div className="text-3xl font-bold text-gray-900">length</div>
+          <div className="text-3xl font-bold text-gray-900">{orders.length}</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Pending</div>
           <div className="text-3xl font-bold text-yellow-600">
-           PENDING
+           {orders.filter((o) => o.orderStatus === "PENDING").length}
           </div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Approved</div>
           <div className="text-3xl font-bold text-green-600">
-           Approved
+           {orders.filter((o) => o.orderStatus === "APPROVED").length}
           </div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
           <div className="text-sm text-gray-600 mb-1">Rejected</div>
           <div className="text-3xl font-bold text-red-600">
-           REJECTED
+           {orders.filter((o) => o.orderStatus === "REJECTED").length}
           </div>
         </div>
       </div>
@@ -96,26 +118,42 @@ export default function SubscriptionPage(){
       <div className="mb-6 flex items-center space-x-3">
         <span className="text-sm font-medium text-gray-700">Filter:</span>
         <button
-          
-          className={`px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 text-white`}
+          onClick={() => setFilter("ALL")}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+            filter === "ALL"
+            ? "bg-indigo-600 text-white"
+            : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+          } `}
         >
           All Orders
         </button>
         <button
-        
-          className={`px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 text-white`}
+          onClick={() => setFilter("PENDING")}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+            filter === "PENDING"
+            ? "bg-indigo-600 text-white"
+            : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+          } `}
         >
           Pending
         </button>
         <button
-          
-          className={`px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 text-white`}
+          onClick={() => setFilter("APPROVED")}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+            filter === "APPROVED"
+            ? "bg-indigo-600 text-white"
+            : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+          } `}
         >
           Approved
         </button>
         <button
-          
-          className={`px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 text-white`}
+          onClick={() => setFilter("REJECTED")}
+          className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+            filter === "REJECTED"
+            ? "bg-indigo-600 text-white"
+            : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+          } `}
         >
           Rejected
         </button>
