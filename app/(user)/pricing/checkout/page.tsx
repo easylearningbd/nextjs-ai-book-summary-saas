@@ -67,9 +67,63 @@ export default function CheckoutPage(){
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-        
-    }
+        if (!paymentProofFile) {
+            toast.error("Please upload payment proof");
+            return;
+        }
+
+        setSubmitting(true);
+
+        try {
+            // upload payment proof file 
+            setUploading(true);
+            const uploadFormData = new FormData();
+            uploadFormData.append("file", paymentProofFile);
+            uploadFormData.append("type", "payment_proof");
+
+            const uploadResponse = await fetch("/api/admin/upload", {
+                method: "POST",
+                body: uploadFormData,
+            });
+
+            if (!uploadResponse.ok) {
+                throw new Error("Failed to upload payment proof");
+            }
+
+            const uploadData = await uploadResponse.json();
+            setUploading(false);
+
+        /// Cerate subscription order data 
+        const orderResponse = await fetch("/api/subscription/orders", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                planType: planType,
+                amount: selectedPlan?.amount,
+                paymentProofUrl: uploadData.url,
+                transactionReference: formData.transactionReference,
+                notes: formData.notes,
+            }),
+        });
+
+        const orderData = await orderResponse.json();
+
+        if (!orderResponse.ok) {
+            throw new Error(orderData.error || "Failed to create order");
+        }
+        toast.success("Payment submitted successfully! Our team will review and active your subscriptions");
+        router.push("/dashboard");  
+
+        } catch (error) {
+            console.error("Checkout error", error);
+            setSubmitting(false);
+            setUploading(false);
+        }
+    };
 
 
 
