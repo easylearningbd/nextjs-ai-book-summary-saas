@@ -34,7 +34,39 @@ export default function CheckoutPage(){
         }
     },[planType, selectedPlan, router]);
 
-    
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error("File size must be less then 5MB");
+                return;
+            }
+
+        if (!file.type.startsWith("image/")) {
+            toast.error("Please upload an image file");
+            return;
+        }
+
+        setPaymentProofFile(file);
+        // Create preview
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setPaymentProofPreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement >) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({...prev, [name]: value }));
+    }
+
+    if (!selectedPlan) {
+        return null;
+    }
+
+
 
 
 
