@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -66,6 +66,11 @@ export default function CheckoutPage(){
         return null;
     }
 
+    const handleSubmit = async (e: React.FormEvent) => {
+
+        
+    }
+
 
 
 
@@ -87,15 +92,15 @@ export default function CheckoutPage(){
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Plan</span>
-                  <span className="font-semibold text-gray-900">name</span>
+                  <span className="font-semibold text-gray-900">{selectedPlan.name}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Price</span>
-                  <span className="font-semibold text-gray-900">price</span>
+                  <span className="font-semibold text-gray-900">{selectedPlan.price}</span>
                 </div>
                 <div className="border-t pt-3 flex justify-between">
                   <span className="font-bold text-gray-900">Total</span>
-                  <span className="font-bold text-2xl text-indigo-600">$amount</span>
+                  <span className="font-bold text-2xl text-indigo-600">${selectedPlan.amount}</span>
                 </div>
               </div>
 
@@ -113,7 +118,7 @@ export default function CheckoutPage(){
 
           {/* Right Column - Payment Form */}
           <div className="lg:col-span-2">
-            <form   className="space-y-6">
+            <form onSubmit={handleSubmit}  className="space-y-6">
               {/* Bank Details */}
               <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Step 1: Bank Transfer Details</h2>
@@ -140,7 +145,7 @@ export default function CheckoutPage(){
                   </div>
                   <div className="border-t border-white/20 pt-3 flex justify-between">
                     <span className="font-semibold">Amount to Transfer:</span>
-                    <span className="text-2xl font-bold">$amount USD</span>
+                    <span className="text-2xl font-bold">${selectedPlan.amount} USD</span>
                   </div>
                 </div>
                 <p className="text-sm text-gray-600 mt-4">
@@ -160,22 +165,22 @@ export default function CheckoutPage(){
                     <input
                       type="file"
                       accept="image/*"
-                       
+                      onChange={handleFileChange}
                       className="hidden"
                       id="payment-proof"
                       required
                     />
                     <label htmlFor="payment-proof" className="cursor-pointer">
-                      
+                    {paymentProofPreview ? (  
                         <div>
                           <img
-                            src=""
+                            src={paymentProofPreview}
                             alt="Payment proof"
                             className="max-h-64 mx-auto rounded-lg mb-3"
                           />
                           <p className="text-sm text-gray-600">Click to change image</p>
                         </div>
-                    
+                    ) : ( 
                         <div>
                           <svg
                             className="mx-auto h-12 w-12 text-gray-400"
@@ -195,7 +200,7 @@ export default function CheckoutPage(){
                           </p>
                           <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
                         </div>
-                     
+                     )} 
                     </label>
                   </div>
                 </div>
@@ -207,8 +212,8 @@ export default function CheckoutPage(){
                   <input
                     type="text"
                     name="transactionReference"
-                  
-                    
+                    value={formData.transactionReference}
+                    onChange={handleChange}
                     placeholder="e.g., TXN123456789"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   />
@@ -223,8 +228,8 @@ export default function CheckoutPage(){
                   </label>
                   <textarea
                     name="notes"
-                    value=""
-                    
+                    value={formData.notes}
+                    onChange={handleChange}
                     rows={3}
                     placeholder="Any additional information..."
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -236,18 +241,23 @@ export default function CheckoutPage(){
               <div className="flex items-center justify-between">
                 <button
                   type="button"
-                  
+                  onClick={() => router.push("/pricing")}
                   className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
-                  
+                  disabled={submitting || uploading}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                 
+                  disabled={submitting || uploading || !paymentProofFile}
                   className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Submit Payment
+                {uploading 
+                ? "Uploading..."
+                : submitting
+                ? "Submitting"
+                : "Submit Payment"
+                }                  
                 </button>
               </div>
             </form>
