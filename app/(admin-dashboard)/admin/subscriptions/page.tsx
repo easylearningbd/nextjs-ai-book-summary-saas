@@ -45,6 +45,7 @@ export default function SubscriptionPage(){
             const response = await fetch(`/api/admin/subscription-orders?status=${filter}`);
             if (response.ok) {
                 const data = await response.json();
+                console.log("order data", data);
                 setOrders(data);
             }
             setLoading(false);
