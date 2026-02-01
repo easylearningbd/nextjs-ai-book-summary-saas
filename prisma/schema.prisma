@@ -268,7 +268,7 @@ enum PaymentStatus {
   FAILED
   REFUNDED
 }
-
+ 
 // 10b. Subscription Orders Table (Bank Transfer)
 model SubscriptionOrder {
   id                    Int                @id @default(autoincrement())
