@@ -55,6 +55,17 @@ export default function SubscriptionPage(){
     }
 
 
+    async function handleApprove(orderId: number) {
+
+    }
+
+
+  async function handleReject(orderId: number) {
+        
+      }
+
+
+
     const getStatusColor = (status: string) => {
         switch (status) {
             case "PENDING":
@@ -69,6 +80,7 @@ export default function SubscriptionPage(){
                 return "bg-gray-100 text-gray-700";        
         }
     }
+ 
 
     if (loading) {
         return (
@@ -245,48 +257,48 @@ export default function SubscriptionPage(){
   </div>
 
               {/* Notes and Rejection Reason */}
-             
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                 
-                    <div className="mb-2">
-                      <span className="font-semibold text-red-700">Rejection Reason: </span>
-                      <span className="text-red-600">rejectedReason</span>
-                    </div>
-                
-                  
-                    <div>
-                      <span className="font-semibold text-blue-800">Notes: </span>
-                      <span className="text-blue-700">notes</span>
-                    </div>
-                 
-                </div>
-              
+  {(order.notes || order.rejectedReason) && (           
+  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+    {order.rejectedReason && ( 
+      <div className="mb-2">
+        <span className="font-semibold text-red-700">Rejection Reason: </span>
+        <span className="text-red-600">{order.rejectedReason}</span>
+      </div>
+     )}
+    {order.notes && ( 
+      <div>
+        <span className="font-semibold text-blue-800">Notes: </span>
+        <span className="text-blue-700">{order.notes}</span>
+      </div>
+    )}
+  </div>
+        )}       
 
               {/* Actions */}
-             
-                <div className="flex items-center space-x-3">
-                  <button
-                   
-                   
-                    className="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50"
-                  >
-                   Processing
-                  </button>
-                  <button
-                    
-                    
-                    className="px-6 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 disabled:opacity-50"
-                  >
-                    Reject
-                  </button>
-                </div>
-             
+   {order.orderStatus === "PENDING" && (           
+  <div className="flex items-center space-x-3">
+    <button
+      onClick={() => handleApprove(order.id)}
+      disabled={processing === order.id}
+      className="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50"
+    >
+     {processing === order.id ? "Processing..." : "Approve & Activate"} 
+    </button>
+    <button
+      onClick={() => handleReject(order.id)}
+      disabled={processing === order.id}
+      className="px-6 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 disabled:opacity-50"
+    >
+      Reject
+    </button>
+  </div>
+   )}     
 
-             
+             {order.approvedAt && ( 
                 <p className="text-sm text-gray-600">
-                  Approved on approvedAt
+                  Approved on {new Date(order.approvedAt).toLocaleDateString()}
                 </p>
-              
+              )}
             </div>
             ))
           )}
@@ -294,26 +306,26 @@ export default function SubscriptionPage(){
       </div>
 
       {/* Image Modal */}
-       
-        {/* <div
+       {selectedImage && ( 
+        <div
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
-          
+          onClick={() =>  setSelectedImage(null)}
         >
           <div className="relative max-w-4xl max-h-full">
             <img
-              src=""
+              src={selectedImage}
               alt="Payment proof"
               className="max-w-full max-h-[90vh] rounded-lg"
             />
             <button
-              
+              onClick={() => setSelectedImage(null)}
               className="absolute top-4 right-4 bg-white text-gray-900 rounded-full p-2 hover:bg-gray-100"
             >
               ✕
             </button>
           </div>
-        </div> */}
-       
+        </div>
+       )}
     </div>
     );
 }
