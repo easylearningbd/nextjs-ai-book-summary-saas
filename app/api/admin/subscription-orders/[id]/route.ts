@@ -67,20 +67,49 @@ export async function PUT(
             endDate.setFullYear(endDate.getFullYear() + 1);
         }
 
-        /// Update order status 
+        /// Update order status
+        await prisma.subscriptionOrder.update({
+            where: { id: parseInt(id)},
+            data: {
+                orderStatus: "APPROVED",
+                approvedBy: session.user.id,
+                approvedAt: now,
+                notes: data.notes || null,
+            },
+        });
 
+        /// Update user table data 
+        await prisma.user.update({
+            where: { id: order.userId },
+            data: {
+                subscriptionTier: order.planType,
+                subscriptionStatus: "ACTIVE",
+                subscriptionStartDate: now, 
+                subscriptionEndDate: endDate,
+            },
+        });
 
+        return NextResponse.json({
+            message: "Subscription approved and activated successfully",
+        }); 
+    } else {
+        // Reject 
+        await prisma.subscriptionOrder.update({
+            where: {id: parseInt(id)},
+            data: {
+                orderStatus:"REJECTED",
+                rejectedReason: data.rejectedReason ||"Payment verification failed",
+                notes: data.notes || null,
+            },
+        });
 
-
-    }
-
-
-
-
+        return NextResponse.json({
+            message: "Subscription order rejected",
+        });
+    } 
         
     } catch (error) {
-        
+        console.error("Error processing subscription order", error);
     }
-
 
 }
