@@ -161,87 +161,88 @@ export default function SubscriptionPage(){
 
       {/* Orders List */}
       <div className="space-y-4">
-       
+       {orders.length === 0 ? ( 
           <div className="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
             <p className="text-gray-500">No subscription orders found.</p>
           </div>
         
-         
+         ) : ( 
+            orders.map((order) => ( 
             <div
-              
+              key={order.id}
               className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
                     <h3 className="text-lg font-bold text-gray-900">
-                      planType Plan
+                      {order.planType} Plan
                     </h3>
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold  }`}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor (order.orderStatus) } }`}
                     >
-                     orderStatus
+                    {order.orderStatus}
                     </span>
                   </div>
                   <Link
                     href={`/admin/users/id`}
                     className="text-indigo-600 hover:text-indigo-800 font-medium"
                   >
-                  fullName
+                  {order.user.fullName} ({order.user.email})
                   </Link>
                   <p className="text-sm text-gray-600 mt-1">
-                    Current: subscriptionStatus
+                    Current: {order.user.subscriptionTier} ({order.user.subscriptionStatus})
                   </p>
                 </div>
                 <div className="text-right">
                   <p className="text-2xl font-bold text-gray-900">
-                  currency
+                  {order.currency} ${order.amount}
                   </p>
                   <p className="text-sm text-gray-600">
-                    createdAt
+                    {new Date(order.createdAt).toLocaleDateString()}
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                {/* Payment Details */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-900 mb-2">Payment Details</h4>
-                  <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Method:</span>
-                      <span className="font-medium">paymentMethod</span>
-                    </div>
-                   
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Reference:</span>
-                        <code className="text-xs bg-white px-2 py-1 rounded">
-                        transactionReference
-                        </code>
-                      </div>
-                    
-                  </div>
-                </div>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    {/* Payment Details */}
+    <div className="bg-gray-50 rounded-lg p-4">
+      <h4 className="font-semibold text-gray-900 mb-2">Payment Details</h4>
+      <div className="space-y-1 text-sm">
+        <div className="flex justify-between">
+          <span className="text-gray-600">Method:</span>
+          <span className="font-medium">{order.paymentMethod}</span>
+        </div>
+        {order.transactionReference && ( 
+          <div className="flex justify-between">
+            <span className="text-gray-600">Reference:</span>
+            <code className="text-xs bg-white px-2 py-1 rounded">
+            {order.transactionReference}
+            </code>
+          </div>
+        )}
+      </div>
+    </div>
 
-                {/* Payment Proof */}
-               
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="font-semibold text-gray-900 mb-2">Payment Proof</h4>
-                    <img
-                      src=""
-                      alt="Payment proof"
-                      className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90"
-                     
-                    />
-                    <button
-                      
-                      className="text-xs text-indigo-600 hover:text-indigo-800 mt-2"
-                    >
-                      View Full Size →
-                    </button>
-                  </div>
-                 
-              </div>
+    {/* Payment Proof */}
+    {order.paymentProofUrl && (
+      <div className="bg-gray-50 rounded-lg p-4">
+        <h4 className="font-semibold text-gray-900 mb-2">Payment Proof</h4>
+        <img
+          src={order.paymentProofUrl}
+          alt="Payment proof"
+          className="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-90"
+          onClick={() => setSelectedImage(order.paymentProofUrl)}
+        />
+        <button
+          onClick={() => window.open(order.paymentProofUrl!, "_blank")}
+          className="text-xs text-indigo-600 hover:text-indigo-800 mt-2"
+        >
+          View Full Size →
+        </button>
+      </div>
+      )}
+  </div>
 
               {/* Notes and Rejection Reason */}
              
@@ -287,7 +288,8 @@ export default function SubscriptionPage(){
                 </p>
               
             </div>
-          
+            ))
+          )}
 
       </div>
 
