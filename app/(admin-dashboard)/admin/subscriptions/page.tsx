@@ -57,12 +57,73 @@ export default function SubscriptionPage(){
 
     async function handleApprove(orderId: number) {
 
+      if (!confirm("Are you sure you want to approve this subscription?")) {
+        return;
+      }
+    setProcessing(orderId);
+
+    try {
+      const response = await fetch(`/api/admin/subscription-orders/${orderId}`, {
+        method:"PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action: "APPROVED"
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Subscription approved and activated successfully");
+        fetchOrders();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to approve subscription");
+      }      
+    } catch (error) {
+      toast.error("An error occurred while approving the subscription");
+    } finally {
+      setProcessing(null);
+     }
     }
 
 
-  async function handleReject(orderId: number) {
-        
-      }
+    async function handleReject(orderId: number) {
+   
+    const reason = prompt("Please enter the reason for rejection");
+    if (!reason) {
+      return;
+    }       
+    setProcessing(orderId);
+
+    try {
+      const response = await fetch(`/api/admin/subscription-orders/${orderId}`, {
+        method:"PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action: "REJECT",
+          rejectedReason: reason,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Subscription order rejected");
+        fetchOrders();
+      } else {
+        const data = await response.json();
+        toast.error(data.error || "Failed to reject subscription");
+      }      
+    } catch (error) {
+      toast.error("An error occurred while rejecting the subscription");
+    } finally {
+      setProcessing(null);
+     }
+    }
+
+
+ 
 
 
 
