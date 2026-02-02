@@ -260,7 +260,7 @@ export default function UsersPage(){
         </td>
         <td className="px-6 py-4 whitespace-nowrap">
             <Link
-            href={`/admin/users/id`}
+            href={`/admin/users/${user.id}`}
             className="text-indigo-600 hover:text-indigo-900 font-semibold text-sm"
             >
             View Details
