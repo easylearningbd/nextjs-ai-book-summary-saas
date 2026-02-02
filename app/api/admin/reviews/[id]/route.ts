@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma"; 
 import { NextRequest,NextResponse } from "next/server";
 import { z } from "zod";
-
+ 
 const reviewUpdateSchema = z.object({
     isApproved: z.boolean(),
 });
