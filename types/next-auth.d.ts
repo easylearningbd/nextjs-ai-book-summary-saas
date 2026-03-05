@@ -23,3 +23,10 @@ declare module "next-auth/jwt" {
         subscriptionTier: SubscriptionTier;     
     }
 }
+
+declare module "@auth/core/adapters" {
+    interface AdapterUser {
+        role: UserRole;
+        subscriptionTier: SubscriptionTier;
+    }
+}
