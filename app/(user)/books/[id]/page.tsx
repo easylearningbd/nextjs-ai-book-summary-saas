@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import Image from "next/image"
 import toast from "react-hot-toast"
+export const dynamic = "force-dynamic";
 
 
 interface Book {

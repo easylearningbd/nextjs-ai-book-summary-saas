@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
-
+export const dynamic = "force-dynamic"; 
 
 export default function CheckoutPage(){
 
