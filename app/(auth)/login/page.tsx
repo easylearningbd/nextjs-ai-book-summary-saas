@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 
-export default function LoginPage(){
+function LoginForm(){
 
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -35,7 +35,6 @@ export default function LoginPage(){
             throw new Error("Invalid email or password");
         }
 
-        // Redireact to dashboard after successfully login 
         router.push("/dashboard");
         router.refresh();        
     } catch (err: any) {
@@ -50,7 +49,6 @@ export default function LoginPage(){
     return ( 
 <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center py-12 px-4">
 <div className="max-w-md w-full">
-{/* Logo */}
 <div className="text-center mb-8">
     <Link href="/" className="inline-flex items-center space-x-2">
     <div className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -68,7 +66,6 @@ export default function LoginPage(){
     </p>
 </div>
 
-{/* Login Form */}
 <div className="bg-white rounded-2xl shadow-xl p-8">
     
     {registered && (
@@ -148,5 +145,13 @@ export default function LoginPage(){
 </div>
 </div>
 </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <LoginForm />
+        </Suspense>
     );
 }
