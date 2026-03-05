@@ -1,10 +1,10 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
-export const dynamic = "force-dynamic"; 
 
-export default function CheckoutPage(){
+
+function CheckoutContent(){
 
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -48,7 +48,6 @@ export default function CheckoutPage(){
         }
 
         setPaymentProofFile(file);
-        // Create preview
         const reader = new FileReader();
         reader.onloadend = () => {
             setPaymentProofPreview(reader.result as string);
@@ -77,7 +76,6 @@ export default function CheckoutPage(){
         setSubmitting(true);
 
         try {
-            // upload payment proof file 
             setUploading(true);
             const uploadFormData = new FormData();
             uploadFormData.append("file", paymentProofFile);
@@ -95,7 +93,6 @@ export default function CheckoutPage(){
             const uploadData = await uploadResponse.json();
             setUploading(false);
 
-        /// Cerate subscription order data 
         const orderResponse = await fetch("/api/subscription/orders", {
             method: "POST",
             headers: {
@@ -125,21 +122,15 @@ export default function CheckoutPage(){
         }
     };
 
-
-
-
-
     return (
         <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Complete Your Purchase</h1>
           <p className="text-gray-600 mt-2">Follow the steps below to upgrade your subscription</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Order Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm sticky top-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Order Summary</h2>
@@ -170,10 +161,8 @@ export default function CheckoutPage(){
             </div>
           </div>
 
-          {/* Right Column - Payment Form */}
           <div className="lg:col-span-2">
             <form onSubmit={handleSubmit}  className="space-y-6">
-              {/* Bank Details */}
               <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Step 1: Bank Transfer Details</h2>
                 <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg p-6 space-y-3">
@@ -207,7 +196,6 @@ export default function CheckoutPage(){
                 </p>
               </div>
 
-              {/* Upload Payment Proof */}
               <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Step 2: Upload Payment Proof</h2>
 
@@ -291,7 +279,6 @@ export default function CheckoutPage(){
                 </div>
               </div>
 
-              {/* Submit */}
               <div className="flex items-center justify-between">
                 <button
                   type="button"
@@ -319,5 +306,17 @@ export default function CheckoutPage(){
         </div>
       </div>
     </div>
+    );
+}
+
+export default function CheckoutPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-xl text-gray-600">Loading...</div>
+            </div>
+        }>
+            <CheckoutContent />
+        </Suspense>
     );
 }
