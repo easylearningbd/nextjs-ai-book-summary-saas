@@ -30,3 +30,10 @@ declare module "@auth/core/adapters" {
         subscriptionTier: SubscriptionTier;
     }
 }
+
+declare module "@auth/prisma-adapter/node_modules/@auth/core/adapters" {
+    interface AdapterUser {
+        role: UserRole;
+        subscriptionTier: SubscriptionTier;
+    }
+}
